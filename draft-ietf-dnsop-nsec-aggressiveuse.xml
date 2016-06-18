@@ -80,39 +80,40 @@
     <keyword>Internet-Draft</keyword>
 
     <abstract>
-      <t>While DNS highly depends on cache, its cache usage of non-existence
-      information has been limited to exact matching. This draft proposes the
-      aggressive use of a NSEC/NSEC3 resource record, which is able to express
-      non-existence of a range of names authoritatively. With this proposal,
-      NXDOMAIN DNS reponse can be returned to the resolvers promptly. It is
-      also expected that non-existent queries to autoritative DNS servers DNS
-      servers including Root and TLD servers will decrease.</t>
+      <t>DNS is highly dependent upon cache. However, its cache of
+      non-existent information has historically been limited to exact
+      matches.This draft proposes the aggressive use of a NSEC/NSEC3 resource
+      record, which is able to express non-existence of a range of names
+      authoritatively. With this proposal, NXDOMAIN DNS reponse can be
+      returned to the resolvers promptly. It is also expected that queries for
+      non-existent information to authoritative DNS servers DNS servers,
+      including Root and TLD servers, will decrease.</t>
 
       <t>[ Ed note: Text inside square brackets ([]) is additional background
       information, answers to frequently asked questions, general musings,
-      etc. They will be removed before publication.</t>
+      etc. They will be removed before publication. </t>
 
       <t>This document is being collaborated on in Github at:
       https://github.com/wkumari/draft-ietf-dnsop-nsec-aggressiveuse. The most
       recent version of the document, open issues, etc should all be available
-      here. The authors (gratefully) accept pull requests ] </t>
+      here. The authors (gratefully) accept pull requests ]</t>
     </abstract>
   </front>
 
   <middle>
     <section anchor="introduction" title="Introduction">
-      <t>While negative (non-existence) information of DNS caching mechanism
-      has been known as DNS negative cache <xref target="RFC2308"/>, it
-      requires exact matching in most cases.</t>
+      <t>A DNS negative cache does currently exist, and is used to cache
+      negative existence. This method of negative caching requires exact
+      matching, in most cases <xref target="RFC2308"/>. This leads to
+      unnecessary additional lookups, which have negative implications for
+      DoS, increase latency, and lead to extra resource utilization on both
+      the authoritative and recursive servers. </t>
 
-      <t>Recently, DNSSEC <xref target="RFC4035"/> <xref target="RFC5155"/>
-      has been practically deployed.</t>
-
-      <t>This document proposes to make a minor change to RFC 4035 and a
-      full-service resolver can use NSEC/NSEC3 resource records aggressively
-      so that such resolvers reponds with NXDOMAIN immediately if the name in
-      question falls into a range expressed by a NSEC/NSEC3 resource record in
-      the cache.</t>
+      <t>This document proposes a minor change to RFC 4035 to allow recusrive
+      resolvers to use NSEC/NSEC3 resource records to aggressively cache
+      negative answers. This would allow such resolvers to repond with
+      NXDOMAIN immediately if the name in question falls into a range
+      expressed by a NSEC/NSEC3 resource record in the cache.</t>
 
       <t>Aggressive Negative Caching was first proposed in Section 6 of DNSSEC
       Lookaside Validation (DLV) <xref target="RFC5074"/> in order to find
@@ -147,36 +148,47 @@
     </section>
 
     <section anchor="problem-statement" title="Problem Statement">
-      <t>While negative (non-existence) information of DNS caching mechanism
-      has been known as DNS negative cache <xref target="RFC2308"/>, it
-      requires exact matching in most cases. Assume that "example.com" zone
-      doesn't have names such as "a.example.com" and "b.example.com". When a
-      full-service resolver receives a query "a.example.com" , it triggers a
-      DNS resolution process and eventually gets NXDOMAIN and stores it into
-      its negative cache. When the full-service resolver receives another
-      query "b.example.com", it doesn't match with "a.example.com". So it will
-      send a query to one of the authoritative servers of "example.com". This
-      was because the NXDOMAIN response just says there is no such name
-      "a.example.com" and it doesn't tell anything for "b.example.com".</t>
+      <t>The current DNS negative cache caches negative (non-existent)
+      information, and requires an exact match in most instances <xref
+      target="RFC2308"/>. Assume that "example.com" zone doesn't have names
+      such as "a.example.com" and "b.example.com". When a full-service
+      resolver receives a query "a.example.com" , it triggers a DNS resolution
+      process and eventually gets NXDOMAIN and stores it into its negative
+      cache. When the full-service resolver receives another query
+      "b.example.com", it doesn't match with "a.example.com". So it will send
+      a query to one of the authoritative servers of "example.com". This was
+      because the NXDOMAIN response just says there is no such name
+      "a.example.com" and it doesn't return any information for
+      "b.example.com", or anything else under "example .com". [TODO: Better
+      example, and how the range would work (alphabetically).]</t>
 
       <t>Section 5 of <xref target="RFC2308"/> seems to show that negative
       answers should be cached only for the exact query name, and not
       (necessarily) for anything below it.</t>
 
       <t>Recently, DNSSEC <xref target="RFC4035"/> <xref target="RFC5155"/>
-      has been practically deployed. Two types of resource record (NSEC and
-      NSEC3) along with their RRSIG records represent authentic
+      has been practically deployed. With DNSSEC, two types of resource record
+      (NSEC and NSEC3), along with their RRSIG records, represent authentic
       non-existence.</t>
 
       <t>For a zone signed with NSEC, it would be possible to use the
-      information carried in NSEC resource records to indicate that a range of
-      names where no valid name exists. Such use is discouraged by Section 4.5
-      of RFC 4035, however.</t>
+      information carried in NSEC resource records to indicate the
+      non-existence of a range of names. However, such use is discouraged by
+      Section 4.5 of RFC 4035, however. [TODO: Want to include any rationale?
+      Otherwise there might be a question of why do it here, if it was
+      (validly?) discouraged in 4.5 of RFC 4035?]</t>
 
       <t>If the full-service resolver can use a NSEC/NSEC3 resource record to
-      prove that names between the range do not exist, the full-service
+      prove that names within a specified range do not exist, the full-service
       resolver can answer NXDOMAIN error immediately when the full-service
-      resolver's cache contain matching NSEC/NSEC3 RRs.</t>
+      resolver's cache contain matching NSEC/NSEC3 RRs. In our example above,
+      this would result in the authoritative server responding that there are
+      no names below "example.com" -- if that were the response, then a
+      separate query for "b.example.com" would be unnecessary. [TODO: Is this
+      the case? If it is, then we should specify no names below example.com in
+      the first paragraph of this section, or no single-letter names, or
+      whatever the example is actually supposed to be. In short, what wildcard
+      would you be suggesting for aggressive use here? * or ? or other?]</t>
 
       <t>This will improve full-resolvers' performance for non-existent
       queries and decrease non-existent queries to authoritative servers.</t>
@@ -194,15 +206,15 @@
         consistent view of the namespace".</t>
 
         <t>To reduce non-existent queries sent to authoritative DNS servers,
-        it is suggested to relax this restriction as follows:</t>
+        this restriction could be relaxed, as follows:</t>
 
         <figure>
           <artwork><![CDATA[
 +--------------------------------------------------------------+
-|  DNSSEC enabled full-service resolvers MAY use               |
-|  NSEC/NSEC3 resource records to generate negative responses  |
-|  until their effective TTLs or signatures on the records     |
-|  in question expire once the records are validated.          |
+|  Once the records are validated, DNSSEC enabled full-service |
+|  resolvers MAY use NSEC/NSEC3 resource records to generate   |
+|  negative responses until their effective TTLs or signatures |
+|  for those records expire.                                   |
 +--------------------------------------------------------------+
 ]]></artwork>
         </figure>
@@ -214,7 +226,7 @@
         servers.</t>
 
         <t>If the query name has the matching NSEC/NSEC3 RR and it proves the
-        query type does not exist, the full-service resolver is possible to
+        information requested does not exist, the full-service resolver may
         respond with a NODATA (empty) answer.</t>
       </section>
 
@@ -230,7 +242,7 @@
 
         <t>If the full-service resolver's cache contains an NSEC RR covering
         the source of synthesis and the covering NSEC RR of the query name,
-        the full-service resolver is possible to respond with NXDOMAIN error
+        the full-service resolver may respond with NXDOMAIN error
         immediately.</t>
       </section>
 
@@ -254,9 +266,9 @@
       </section>
 
       <section anchor="wildcard" title="Wildcard">
-        <t>The last paragraph of RFC 4035 Section 4.5 talks about aggressive
-        use of a cached deduced wildcard (as well as aggressive use of NSEC)
-        but rather recommends not to rely on it.</t>
+        <t>The last paragraph of RFC 4035 Section 4.5 discusses aggressive use
+        of a cached deduced wildcard (as well as aggressive use of NSEC) and
+        recommends that it is not relied upon.</t>
 
         <t>Just like the case for the aggressive use of NSEC discussed in this
         draft, we could revisit this recommendation. As long as the
@@ -266,10 +278,11 @@
         benefits. (Note that, so far, this is orthogonal to "when aggressive
         use (of NSEC) is enabled").</t>
 
-        <t>Furthermore* when aggressive use of NSEC is enabled, the aggressive
-        use of cached deduced wildcard will be more effective as the
-        aggressive NSEC use helps prove more names wouldn't exist without the
-        wildcard through fewer external queries.</t>
+        <t>Furthermore, when aggressive use of NSEC is enabled, the aggressive
+        use of cached deduced wildcard will be more effective; the aggressive
+        NSEC use helps prove more names wouldn't exist without the wildcard
+        through fewer external queries. [TODO: I cannot parse the section of
+        the prior sentence after the semicolon.]</t>
 
         <t>A full-service resolver implementation MAY support aggressive use
         of wildcards. It SHOULD provide a configuration knob to disable
@@ -277,14 +290,14 @@
       </section>
 
       <section anchor="consideration-on-ttl" title="Consideration on TTL">
-        <t>This function needs care on the TTL value of negative information
+        <t>The TTL value of negative information is especially important,
         because newly added domain names cannot be used while the negative
         information is effective. Section 5 of RFC 2308 states the maximum
         number of negative cache TTL value is 3 hours (10800). So the
         full-service resolver SHOULD limit the maximum effective TTL value of
         negative responses (NSEC/NSEC3 RRs) to 10800 (3 hours). It is
-        reasonably small but still effective for the purpose of this document
-        as it can eliminate significant amount of DNS attacks with randomly
+        reasonably small but still effective for the purpose of this document,
+        since it can eliminate significant amount of DNS attacks with randomly
         generated names.</t>
       </section>
     </section>
@@ -293,7 +306,8 @@
       <section anchor="decrease-of-root-dns-server-queries"
                title="Decrease of root DNS server queries">
         <t>Aggressive use of NSEC/NSEC3 resource records may decrease queries
-        to Root DNS servers.</t>
+        to Root DNS servers. [TODO: Make clear this is a feature, not a bug
+        :-P ]</t>
 
         <t>People may generate many typos in TLD, and they will result in
         unnecessary DNS queries. Some implementations leak non-existent TLD
@@ -308,15 +322,15 @@
       <section anchor="possible-mitigation-of-random-subdomain-attacks"
                title="Possible mitigation of random subdomain attacks">
         <t>Random sub-domain attacks (referred to as "Water Torture" attacks
-        or NXDomain attacks) send many non-existent queries to full-service
-        resolvers. Their query names consist of random prefixes and a target
-        domain name. The negative cache does not work well and target
-        full-service resolvers result in sending queries to authoritative DNS
-        servers of the target domain name.</t>
+        or NXDomain attacks) send many queries for non-existent information to
+        full-service resolvers. Their query names consist of random prefixes
+        and a target domain name. The negative cache does not work well, and
+        thus targetted full-service resolvers end up sending queries to
+        authoritative DNS servers of the target domain name.</t>
 
-        <t>When number of queries is large, the full-service resolvers drop
-        queries from both legitimate users and attackers as their outstanding
-        queues are filled up.</t>
+        <t>When the number of queries is large, the full-service resolvers
+        drop queries from both legitimate users and attackers as their
+        outstanding queues are filled up.</t>
 
         <t>For example, BIND 9.10.2 <xref target="BIND9"/> full-service
         resolvers answer SERVFAIL and Unbound 1.5.2 full-service resolvers
@@ -326,10 +340,10 @@
         and disabling name resolution of target domain names in ad-hoc
         manner.</t>
 
-        <t>If the full-service resolver support aggressive negative caching
+        <t>If the full-service resolver supports aggressive negative caching
         and the target domain name is signed with NSEC/NSEC3 (without
-        Opt-Out), it may be possible countermeasure of random subdomain
-        attacks.</t>
+        Opt-Out), it may be used as a possible countermeasure of random
+        subdomain attacks.</t>
 
         <t>However, attackers can set the CD bit to their attack queries. The
         CD bit disables signature validation and the aggressive negative
@@ -350,15 +364,20 @@
         domain names.</t>
 
         <t>NSEC only aggressive negative caching is easier to implement
-        NSEC/NSEC3 aggressive negative caching (full implantation) because
-        NSEC3 handling is hard to implement.</t>
+        NSEC/NSEC3 aggressive negative caching (full implementation) because
+        NSEC3 handling is hard to implement. [TODO: This says, x is easier to implemtnt, because y is hard to
+        implement. -- Add detail, or otherwise fix.]</t>
 
         <t>Root only aggressive negative caching is also possible. It uses
         NSEC and RRSIG resource records whose signer domain name is root.</t>
 
         <t><xref target="I-D.wkumari-dnsop-cheese-shop"/> proposed root only
         aggressive negative caching in order to decrease defects and
-        standardize fast.</t>
+        standardize quickly. The root zone has certain properties that make it
+        a special case: It is DNSSEC signed and uses NSEC, the majority of the
+        queries are "junk" queries, the rate of change is relatively slow, and
+        there are no corner cases such as wildcards. Because of these
+        properties, [TODO: Sorry; i'm not sure what to fill in here.]</t>
       </section>
 
       <section anchor="aggressive-negative-caching-flag-idea"
@@ -368,16 +387,17 @@
         target="RFC4470"/>. Aggressive negative caching does not work with
         minimally covering NSEC records. Most of DNS operators don't want zone
         enumeration and zone information leaks. They prefer NSEC resource
-        records with narrow ranges. When there is a flag that show a
-        full-service resolver support the aggressive negative caching and a
-        query have the aggressive negative caching flag, authoritative DNS
-        servers can generate NSEC resource records with wider range under
-        random subdomain attacks.</t>
+        records with narrow ranges. When a flag shows a full-service resolver
+        supporting the aggressive negative caching and a query has the
+        aggressive negative caching flag, authoritative DNS servers can
+        generate NSEC resource records with wider range under random subdomain
+        attacks.</t>
 
-        <t>However, changing range of minimally covering NSEC Records may be
-        implemented by detecting attacks. Authoritative DNS servers can answer
-        any range of minimally covering NSEC Records with attention about zone
-        information leak.</t>
+        <t>However, changing the range of minimally covering NSEC Records may
+        be implemented by detecting attacks. Authoritative DNS servers can
+        answer any range of minimally covering NSEC Records with attention
+        about zone information leak. [TODO: I don't understand this paragraph,
+        but it could well just be me.]</t>
       </section>
     </section>
 
@@ -387,14 +407,14 @@
 
     <section anchor="securitycons" title="Security Considerations">
       <t>Newly registered resource records may not be used immediately.
-      However, choosing suitable TTL value will mitigate the problem and it is
-      not a security problem.</t>
+      However, choosing suitable TTL value will mitigate the delay concern,
+      and it is not a security problem.</t>
 
       <t>It is also suggested to limit the maximum TTL value of NSEC / NSEC3
       resource records in the negative cache to, for example, 10800 seconds
-      (3hrs), to mitigate the issue. Implementations which comply with this
-      proposal is suggested to have a configurable maximum value of NSEC RRs
-      in the negative cache.</t>
+      (3hrs), to mitigate this issue. Implementations which comply with this
+      proposal are recommended to have a configurable maximum value of NSEC
+      RRs in the negative cache.</t>
 
       <t>Aggressive use of NSEC / NSEC3 resource records without DNSSEC
       validation may cause security problems. It is highly recommended to
