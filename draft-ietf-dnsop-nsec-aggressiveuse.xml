@@ -7,7 +7,7 @@
 <?rfc sortrefs="yes"?>
 <?rfc symrefs="yes"?>
 <rfc category="info" docName="draft-ietf-dnsop-nsec-aggressiveuse-00"
-     ipr="trust200902">
+     ipr="trust200902" updates="4035">
   <front>
     <title abbrev="NSEC/NSEC3 usage">Aggressive use of NSEC/NSEC3</title>
 
@@ -80,18 +80,16 @@
     <keyword>Internet-Draft</keyword>
 
     <abstract>
-      <t>DNS is highly dependent upon cache. However, its cache of
-      non-existent information has historically been limited to exact
-      matches.This draft proposes the aggressive use of a NSEC/NSEC3 resource
-      record, which is able to express non-existence of a range of names
-      authoritatively. With this proposal, NXDOMAIN DNS reponse can be
-      returned to the resolvers promptly. It is also expected that queries for
-      non-existent information to authoritative DNS servers DNS servers,
-      including Root and TLD servers, will decrease.</t>
+      <t>The DNS relies upon caching to scale; however, the fact that a name
+      does not exist requires an exact match. This document specifies the use
+      of NSEC/NSEC3 resource records to authioratively generate negative
+      answers for a range. This increases resilience to DoS attacks, increases
+      performance / decreases latency, decreases resource utilization on both
+      authoritative and recursive servers, and also increases privacy.</t>
 
       <t>[ Ed note: Text inside square brackets ([]) is additional background
       information, answers to frequently asked questions, general musings,
-      etc. They will be removed before publication. </t>
+      etc. They will be removed before publication.</t>
 
       <t>This document is being collaborated on in Github at:
       https://github.com/wkumari/draft-ietf-dnsop-nsec-aggressiveuse. The most
@@ -102,24 +100,22 @@
 
   <middle>
     <section anchor="introduction" title="Introduction">
-      <t>A DNS negative cache does currently exist, and is used to cache
-      negative existence. This method of negative caching requires exact
-      matching, in most cases <xref target="RFC2308"/>. This leads to
-      unnecessary additional lookups, which have negative implications for
-      DoS, increase latency, and lead to extra resource utilization on both
-      the authoritative and recursive servers. </t>
+      <t>A DNS negative cache does currently exist, and is used to cache the
+      fact that a name does not exist. This method of negative caching
+      requires exact matching, which leads to unnecessary additional lookups,
+      which have negative implications for DoS survivability, increases
+      latency, leads to extra resource utilization on both authoritative and
+      recursive servers, and decreases privacy by leaking queries.</t>
 
-      <t>This document proposes a minor change to RFC 4035 to allow recusrive
+      <t>This document proposes a minor change to RFC 4035 to allow recursive
       resolvers to use NSEC/NSEC3 resource records to aggressively cache
-      negative answers. This would allow such resolvers to repond with
+      negative answers. This would allow such resolvers to respond with
       NXDOMAIN immediately if the name in question falls into a range
       expressed by a NSEC/NSEC3 resource record in the cache.</t>
 
       <t>Aggressive Negative Caching was first proposed in Section 6 of DNSSEC
       Lookaside Validation (DLV) <xref target="RFC5074"/> in order to find
-      covering NSEC records efficiently. Unbound <xref target="UNBOUND"/> has
-      aggressive negative caching code in its DLV validator. Unbound TODO file
-      contains "NSEC/NSEC3 aggressive negative caching".</t>
+      covering NSEC records efficiently.</t>
 
       <t>Section 3 of <xref target="I-D.vixie-dnsext-resimprove"/> "Stopping
       Downward Cache Search on NXDOMAIN" and <xref
@@ -137,39 +133,57 @@
       DNS Terminology <xref target="RFC7719"/>.</t>
 
       <t>The key words "Closest Encloser" and "Source of Synthesis" in this
-      document are to be interpreted as described in The Role of Wildcards
-      <xref target="RFC4592"/>.</t>
+      document are to be interpreted as described in<xref
+      target="RFC4592"/>.</t>
 
-      <t>The key word "Closest Encloser" is also defined in NSEC3 <xref
-      target="RFC5155"/>.</t>
-
-      <t>The key words "Next closer name" in this document is to be
-      interpreted as described in NSEC3 <xref target="RFC5155"/>.</t>
+      <t>"Closest Encloser" is also defined in NSEC3 <xref target="RFC5155"/>,
+      as is "Next closer name".</t>
     </section>
 
     <section anchor="problem-statement" title="Problem Statement">
       <t>The current DNS negative cache caches negative (non-existent)
       information, and requires an exact match in most instances <xref
-      target="RFC2308"/>. Assume that "example.com" zone doesn't have names
-      such as "a.example.com" and "b.example.com". When a full-service
-      resolver receives a query "a.example.com" , it triggers a DNS resolution
-      process and eventually gets NXDOMAIN and stores it into its negative
-      cache. When the full-service resolver receives another query
-      "b.example.com", it doesn't match with "a.example.com". So it will send
-      a query to one of the authoritative servers of "example.com". This was
-      because the NXDOMAIN response just says there is no such name
-      "a.example.com" and it doesn't return any information for
-      "b.example.com", or anything else under "example .com". [TODO: Better
-      example, and how the range would work (alphabetically).]</t>
+      target="RFC2308"/>.</t>
 
-      <t>Section 5 of <xref target="RFC2308"/> seems to show that negative
-      answers should be cached only for the exact query name, and not
-      (necessarily) for anything below it.</t>
+      <t>Assume that the (DNSSEC signed) "example.com" zone contains:</t>
 
-      <t>Recently, DNSSEC <xref target="RFC4035"/> <xref target="RFC5155"/>
-      has been practically deployed. With DNSSEC, two types of resource record
-      (NSEC and NSEC3), along with their RRSIG records, represent authentic
-      non-existence.</t>
+      <t><list style="empty">
+          <t>apple.example.com IN A 192.0.2.1</t>
+
+          <t>elephant.example.com IN A 192.0.2.2</t>
+
+          <t>zebra.example.com IN A 192.0.2.3</t>
+        </list></t>
+
+      <t>If a recursive resolver gets a query for cat.example.com, it will
+      query the authoritative servers for example.com and will get back an
+      NSEC (or NSEC3) record starting that there are no records between apple
+      and elephant. If the recursive resolver then gets a query for
+      ball.example.com it will once again go and ask the example.com servers,
+      and will get back the same NSEC/NSEC3 record - this will happen for
+      cat.example.com, dog.example.com, etc.Apart from wasting bandwidth, this
+      also wastes resources on the recursive server (it needs to keep state
+      for outstanding queries), wastes resources on the authoritative server
+      (it has to answer additional questions), increases latency (the end user
+      has to wait longer than necessary to get back an NXDOMAIN answer), can
+      be used by attackers to cause a DoS (see additional resources), and also
+      has privacy implications (e.g: typos leak out further than
+      necessary).</t>
+    </section>
+
+    <section title="Background">
+      <t>DNSSEC <xref target="RFC4035"/> and <xref target="RFC5155"/> both
+      provide "authenticated denial of existence"; this is a
+      (cryptographically secured) proof that the queried for name does not
+      exist - this is accomplished by providing a (DNSSEC secured) record
+      containing the names alphabetically before and after the queried for
+      name. In the example above</t>
+
+      <t>Instead, this document specifies that, if a recursive resolver gets a
+      query for a name within a range covered by an NSEC (or NSEC3) record in
+      its cache, it should immediately respond with the negative answer from
+      its cache, and should not bother sending the query to the authoritative
+      server.</t>
 
       <t>For a zone signed with NSEC, it would be possible to use the
       information carried in NSEC resource records to indicate the
@@ -189,14 +203,13 @@
       the first paragraph of this section, or no single-letter names, or
       whatever the example is actually supposed to be. In short, what wildcard
       would you be suggesting for aggressive use here? * or ? or other?]</t>
-
-      <t>This will improve full-resolvers' performance for non-existent
-      queries and decrease non-existent queries to authoritative servers.</t>
     </section>
 
     <section anchor="proposed-solution" title="Proposed Solution">
       <section anchor="aggressive-negative-caching"
                title="Aggressive Negative Caching">
+        <t/>
+
         <t>Section 4.5 of <xref target="RFC4035"/> shows that "In theory, a
         resolver could use wildcards or NSEC RRs to generate positive and
         negative responses (respectively) until the TTL or signatures on the
@@ -325,7 +338,7 @@
         or NXDomain attacks) send many queries for non-existent information to
         full-service resolvers. Their query names consist of random prefixes
         and a target domain name. The negative cache does not work well, and
-        thus targetted full-service resolvers end up sending queries to
+        thus targeted full-service resolvers end up sending queries to
         authoritative DNS servers of the target domain name.</t>
 
         <t>When the number of queries is large, the full-service resolvers
@@ -365,8 +378,9 @@
 
         <t>NSEC only aggressive negative caching is easier to implement
         NSEC/NSEC3 aggressive negative caching (full implementation) because
-        NSEC3 handling is hard to implement. [TODO: This says, x is easier to implemtnt, because y is hard to
-        implement. -- Add detail, or otherwise fix.]</t>
+        NSEC3 handling is hard to implement. [TODO: This says, x is easier to
+        implement, because y is hard to implement. -- Add detail, or otherwise
+        fix.]</t>
 
         <t>Root only aggressive negative caching is also possible. It uses
         NSEC and RRSIG resource records whose signer domain name is root.</t>
@@ -377,7 +391,7 @@
         a special case: It is DNSSEC signed and uses NSEC, the majority of the
         queries are "junk" queries, the rate of change is relatively slow, and
         there are no corner cases such as wildcards. Because of these
-        properties, [TODO: Sorry; i'm not sure what to fill in here.]</t>
+        properties, we know that generated negative answers will work.</t>
       </section>
 
       <section anchor="aggressive-negative-caching-flag-idea"

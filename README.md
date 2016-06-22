@@ -6,9 +6,9 @@
 
 Network Working Group                                        K. Fujiwara
 Internet-Draft                                                      JPRS
-Intended status: Informational                                   A. Kato
-Expires: December 17, 2016                                     Keio/WIDE
-                                                               W. Kumari
+Updates: 4035 (if approved)                                      A. Kato
+Intended status: Informational                                 Keio/WIDE
+Expires: December 17, 2016                                     W. Kumari
                                                                   Google
                                                            June 15, 2016
 
@@ -18,14 +18,13 @@ Expires: December 17, 2016                                     Keio/WIDE
 
 Abstract
 
-   DNS is highly dependent upon cache.  However, its cache of non-
-   existent information has historically been limited to exact
-   matches.This draft proposes the aggressive use of a NSEC/NSEC3
-   resource record, which is able to express non-existence of a range of
-   names authoritatively.  With this proposal, NXDOMAIN DNS reponse can
-   be returned to the resolvers promptly.  It is also expected that
-   queries for non-existent information to authoritative DNS servers DNS
-   servers, including Root and TLD servers, will decrease.
+   The DNS relies upon caching to scale; however, the fact that a name
+   does not exist requires an exact match.  This document specifies the
+   use of NSEC/NSEC3 resource records to authioratively generate
+   negative answers for a range.  This increases resilience to DoS
+   attacks, increases performance / decreases latency, decreases
+   resource utilization on both authoritative and recursive servers, and
+   also increases privacy.
 
    [ Ed note: Text inside square brackets ([]) is additional background
    information, answers to frequently asked questions, general musings,
@@ -55,6 +54,7 @@ Status of This Memo
 
 
 
+
 Fujiwara, et al.        Expires December 17, 2016               [Page 1]
 
 Internet-Draft              NSEC/NSEC3 usage                   June 2016
@@ -80,33 +80,33 @@ Table of Contents
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
    2.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   3
    3.  Problem Statement . . . . . . . . . . . . . . . . . . . . . .   3
-   4.  Proposed Solution . . . . . . . . . . . . . . . . . . . . . .   4
-     4.1.  Aggressive Negative Caching . . . . . . . . . . . . . . .   5
-     4.2.  NSEC  . . . . . . . . . . . . . . . . . . . . . . . . . .   5
-     4.3.  NSEC3 . . . . . . . . . . . . . . . . . . . . . . . . . .   6
-     4.4.  Wildcard  . . . . . . . . . . . . . . . . . . . . . . . .   6
-     4.5.  Consideration on TTL  . . . . . . . . . . . . . . . . . .   7
-   5.  Possible side effects . . . . . . . . . . . . . . . . . . . .   7
-     5.1.  Decrease of root DNS server queries . . . . . . . . . . .   7
-     5.2.  Possible mitigation of random subdomain attacks . . . . .   7
-   6.  Additional proposals  . . . . . . . . . . . . . . . . . . . .   8
-     6.1.  Partial implementation  . . . . . . . . . . . . . . . . .   8
-     6.2.  Aggressive negative caching flag idea . . . . . . . . . .   8
-   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   9
-   8.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
-   9.  Implementation Status . . . . . . . . . . . . . . . . . . . .   9
-   10. Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .   9
-   11. Change History  . . . . . . . . . . . . . . . . . . . . . . .   9
-     11.1.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-01 . . .  10
-     11.2.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-02 . . .  10
-     11.3.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-03 . . .  10
-   12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  11
-     12.1.  Normative References . . . . . . . . . . . . . . . . . .  11
-     12.2.  Informative References . . . . . . . . . . . . . . . . .  11
+   4.  Background  . . . . . . . . . . . . . . . . . . . . . . . . .   4
+   5.  Proposed Solution . . . . . . . . . . . . . . . . . . . . . .   5
+     5.1.  Aggressive Negative Caching . . . . . . . . . . . . . . .   5
+     5.2.  NSEC  . . . . . . . . . . . . . . . . . . . . . . . . . .   5
+     5.3.  NSEC3 . . . . . . . . . . . . . . . . . . . . . . . . . .   6
+     5.4.  Wildcard  . . . . . . . . . . . . . . . . . . . . . . . .   6
+     5.5.  Consideration on TTL  . . . . . . . . . . . . . . . . . .   7
+   6.  Possible side effects . . . . . . . . . . . . . . . . . . . .   7
+     6.1.  Decrease of root DNS server queries . . . . . . . . . . .   7
+     6.2.  Possible mitigation of random subdomain attacks . . . . .   7
+   7.  Additional proposals  . . . . . . . . . . . . . . . . . . . .   8
+     7.1.  Partial implementation  . . . . . . . . . . . . . . . . .   8
+     7.2.  Aggressive negative caching flag idea . . . . . . . . . .   8
+   8.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   9
+   9.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
+   10. Implementation Status . . . . . . . . . . . . . . . . . . . .   9
+   11. Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .   9
+   12. Change History  . . . . . . . . . . . . . . . . . . . . . . .   9
+     12.1.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-01 . . .  10
+     12.2.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-02 . . .  10
+     12.3.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-03 . . .  10
+   13. References  . . . . . . . . . . . . . . . . . . . . . . . . .  11
+     13.1.  Normative References . . . . . . . . . . . . . . . . . .  11
+     13.2.  Informative References . . . . . . . . . . . . . . . . .  11
    Appendix A.  Aggressive negative caching from RFC 5074  . . . . .  12
    Appendix B.  Detailed implementation idea . . . . . . . . . . . .  13
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  15
-
 
 
 
@@ -118,24 +118,23 @@ Internet-Draft              NSEC/NSEC3 usage                   June 2016
 
 1.  Introduction
 
-   A DNS negative cache does currently exist, and is used to cache
-   negative existence.  This method of negative caching requires exact
-   matching, in most cases [RFC2308].  This leads to unnecessary
-   additional lookups, which have negative implications for DoS,
-   increase latency, and lead to extra resource utilization on both the
-   authoritative and recursive servers.
+   A DNS negative cache does currently exist, and is used to cache the
+   fact that a name does not exist.  This method of negative caching
+   requires exact matching, which leads to unnecessary additional
+   lookups, which have negative implications for DoS survivability,
+   increases latency, leads to extra resource utilization on both
+   authoritative and recursive servers, and decreases privacy by leaking
+   queries.
 
-   This document proposes a minor change to RFC 4035 to allow recusrive
+   This document proposes a minor change to RFC 4035 to allow recursive
    resolvers to use NSEC/NSEC3 resource records to aggressively cache
-   negative answers.  This would allow such resolvers to repond with
+   negative answers.  This would allow such resolvers to respond with
    NXDOMAIN immediately if the name in question falls into a range
    expressed by a NSEC/NSEC3 resource record in the cache.
 
    Aggressive Negative Caching was first proposed in Section 6 of DNSSEC
    Lookaside Validation (DLV) [RFC5074] in order to find covering NSEC
-   records efficiently.  Unbound [UNBOUND] has aggressive negative
-   caching code in its DLV validator.  Unbound TODO file contains "NSEC/
-   NSEC3 aggressive negative caching".
+   records efficiently.
 
    Section 3 of [I-D.vixie-dnsext-resimprove] "Stopping Downward Cache
    Search on NXDOMAIN" and [I-D.ietf-dnsop-nxdomain-cut] proposed
@@ -151,19 +150,20 @@ Internet-Draft              NSEC/NSEC3 usage                   June 2016
    DNS Terminology [RFC7719].
 
    The key words "Closest Encloser" and "Source of Synthesis" in this
-   document are to be interpreted as described in The Role of Wildcards
-   [RFC4592].
+   document are to be interpreted as described in[RFC4592].
 
-   The key word "Closest Encloser" is also defined in NSEC3 [RFC5155].
-
-   The key words "Next closer name" in this document is to be
-   interpreted as described in NSEC3 [RFC5155].
+   "Closest Encloser" is also defined in NSEC3 [RFC5155], as is "Next
+   closer name".
 
 3.  Problem Statement
 
    The current DNS negative cache caches negative (non-existent)
    information, and requires an exact match in most instances [RFC2308].
-   Assume that "example.com" zone doesn't have names such as
+
+   Assume that the (DNSSEC signed) "example.com" zone contains:
+
+      apple.example.com IN A 192.0.2.1
+
 
 
 
@@ -172,24 +172,38 @@ Fujiwara, et al.        Expires December 17, 2016               [Page 3]
 Internet-Draft              NSEC/NSEC3 usage                   June 2016
 
 
-   "a.example.com" and "b.example.com".  When a full-service resolver
-   receives a query "a.example.com" , it triggers a DNS resolution
-   process and eventually gets NXDOMAIN and stores it into its negative
-   cache.  When the full-service resolver receives another query
-   "b.example.com", it doesn't match with "a.example.com".  So it will
-   send a query to one of the authoritative servers of "example.com".
-   This was because the NXDOMAIN response just says there is no such
-   name "a.example.com" and it doesn't return any information for
-   "b.example.com", or anything else under "example .com".  [TODO:
-   Better example, and how the range would work (alphabetically).]
+      elephant.example.com IN A 192.0.2.2
 
-   Section 5 of [RFC2308] seems to show that negative answers should be
-   cached only for the exact query name, and not (necessarily) for
-   anything below it.
+      zebra.example.com IN A 192.0.2.3
 
-   Recently, DNSSEC [RFC4035] [RFC5155] has been practically deployed.
-   With DNSSEC, two types of resource record (NSEC and NSEC3), along
-   with their RRSIG records, represent authentic non-existence.
+   If a recursive resolver gets a query for cat.example.com, it will
+   query the authoritative servers for example.com and will get back an
+   NSEC (or NSEC3) record starting that there are no records between
+   apple and elephant.  If the recursive resolver then gets a query for
+   ball.example.com it will once again go and ask the example.com
+   servers, and will get back the same NSEC/NSEC3 record - this will
+   happen for cat.example.com, dog.example.com, etc.Apart from wasting
+   bandwidth, this also wastes resources on the recursive server (it
+   needs to keep state for outstanding queries), wastes resources on the
+   authoritative server (it has to answer additional questions),
+   increases latency (the end user has to wait longer than necessary to
+   get back an NXDOMAIN answer), can be used by attackers to cause a DoS
+   (see additional resources), and also has privacy implications (e.g:
+   typos leak out further than necessary).
+
+4.  Background
+
+   DNSSEC [RFC4035] and [RFC5155] both provide "authenticated denial of
+   existence"; this is a (cryptographically secured) proof that the
+   queried for name does not exist - this is accomplished by providing a
+   (DNSSEC secured) record containing the names alphabetically before
+   and after the queried for name.  In the example above
+
+   Instead, this document specifies that, if a recursive resolver gets a
+   query for a name within a range covered by an NSEC (or NSEC3) record
+   in its cache, it should immediately respond with the negative answer
+   from its cache, and should not bother sending the query to the
+   authoritative server.
 
    For a zone signed with NSEC, it would be possible to use the
    information carried in NSEC resource records to indicate the non-
@@ -206,20 +220,6 @@ Internet-Draft              NSEC/NSEC3 usage                   June 2016
    responding that there are no names below "example.com" -- if that
    were the response, then a separate query for "b.example.com" would be
    unnecessary.  [TODO: Is this the case?  If it is, then we should
-   specify no names below example.com in the first paragraph of this
-   section, or no single-letter names, or whatever the example is
-   actually supposed to be.  In short, what wildcard would you be
-   suggesting for aggressive use here? * or ? or other?]
-
-   This will improve full-resolvers' performance for non-existent
-   queries and decrease non-existent queries to authoritative servers.
-
-4.  Proposed Solution
-
-
-
-
-
 
 
 
@@ -228,7 +228,14 @@ Fujiwara, et al.        Expires December 17, 2016               [Page 4]
 Internet-Draft              NSEC/NSEC3 usage                   June 2016
 
 
-4.1.  Aggressive Negative Caching
+   specify no names below example.com in the first paragraph of this
+   section, or no single-letter names, or whatever the example is
+   actually supposed to be.  In short, what wildcard would you be
+   suggesting for aggressive use here? * or ? or other?]
+
+5.  Proposed Solution
+
+5.1.  Aggressive Negative Caching
 
    Section 4.5 of [RFC4035] shows that "In theory, a resolver could use
    wildcards or NSEC RRs to generate positive and negative responses
@@ -257,7 +264,7 @@ Internet-Draft              NSEC/NSEC3 usage                   June 2016
    information requested does not exist, the full-service resolver may
    respond with a NODATA (empty) answer.
 
-4.2.  NSEC
+5.2.  NSEC
 
    If a full-service resolver implementation supports aggressive
    negative caching, then it SHOULD support aggressive use of NSEC and
@@ -268,13 +275,6 @@ Internet-Draft              NSEC/NSEC3 usage                   June 2016
    matching/covering the source of synthesis and an NSEC RR covering the
    query name.
 
-   If the full-service resolver's cache contains an NSEC RR covering the
-   source of synthesis and the covering NSEC RR of the query name, the
-   full-service resolver may respond with NXDOMAIN error immediately.
-
-
-
-
 
 
 
@@ -284,7 +284,11 @@ Fujiwara, et al.        Expires December 17, 2016               [Page 5]
 Internet-Draft              NSEC/NSEC3 usage                   June 2016
 
 
-4.3.  NSEC3
+   If the full-service resolver's cache contains an NSEC RR covering the
+   source of synthesis and the covering NSEC RR of the query name, the
+   full-service resolver may respond with NXDOMAIN error immediately.
+
+5.3.  NSEC3
 
    NSEC3 aggressive negative caching is more difficult.  If the zone is
    signed with NSEC3, the validating resolver need to check the
@@ -304,7 +308,7 @@ Internet-Draft              NSEC/NSEC3 usage                   June 2016
    NSEC3.  It SHOULD provide a configuration knob to disable aggressive
    use of NSEC3 in this case.
 
-4.4.  Wildcard
+5.4.  Wildcard
 
    The last paragraph of RFC 4035 Section 4.5 discusses aggressive use
    of a cached deduced wildcard (as well as aggressive use of NSEC) and
@@ -331,16 +335,12 @@ Internet-Draft              NSEC/NSEC3 usage                   June 2016
 
 
 
-
-
-
-
 Fujiwara, et al.        Expires December 17, 2016               [Page 6]
 
 Internet-Draft              NSEC/NSEC3 usage                   June 2016
 
 
-4.5.  Consideration on TTL
+5.5.  Consideration on TTL
 
    The TTL value of negative information is especially important,
    because newly added domain names cannot be used while the negative
@@ -352,9 +352,9 @@ Internet-Draft              NSEC/NSEC3 usage                   June 2016
    document, since it can eliminate significant amount of DNS attacks
    with randomly generated names.
 
-5.  Possible side effects
+6.  Possible side effects
 
-5.1.  Decrease of root DNS server queries
+6.1.  Decrease of root DNS server queries
 
    Aggressive use of NSEC/NSEC3 resource records may decrease queries to
    Root DNS servers.  [TODO: Make clear this is a feature, not a bug :-P
@@ -369,13 +369,13 @@ Internet-Draft              NSEC/NSEC3 usage                   June 2016
    time, as well as reduces the DNS queries to corresponding
    authoritative servers, including Root DNS servers.
 
-5.2.  Possible mitigation of random subdomain attacks
+6.2.  Possible mitigation of random subdomain attacks
 
    Random sub-domain attacks (referred to as "Water Torture" attacks or
    NXDomain attacks) send many queries for non-existent information to
    full-service resolvers.  Their query names consist of random prefixes
    and a target domain name.  The negative cache does not work well, and
-   thus targetted full-service resolvers end up sending queries to
+   thus targeted full-service resolvers end up sending queries to
    authoritative DNS servers of the target domain name.
 
    When the number of queries is large, the full-service resolvers drop
@@ -405,11 +405,11 @@ Internet-Draft              NSEC/NSEC3 usage                   June 2016
    CD bit disables signature validation and the aggressive negative
    caching will be of no use.
 
-6.  Additional proposals
+7.  Additional proposals
 
    There are additional proposals to the aggressive negative caching.
 
-6.1.  Partial implementation
+7.1.  Partial implementation
 
    It is possible to implement aggressive negative caching partially.
 
@@ -419,7 +419,7 @@ Internet-Draft              NSEC/NSEC3 usage                   June 2016
    NSEC only aggressive negative caching is easier to implement NSEC/
    NSEC3 aggressive negative caching (full implementation) because NSEC3
    handling is hard to implement.  [TODO: This says, x is easier to
-   implemtnt, because y is hard to implement. -- Add detail, or
+   implement, because y is hard to implement. -- Add detail, or
    otherwise fix.]
 
    Root only aggressive negative caching is also possible.  It uses NSEC
@@ -431,9 +431,9 @@ Internet-Draft              NSEC/NSEC3 usage                   June 2016
    case: It is DNSSEC signed and uses NSEC, the majority of the queries
    are "junk" queries, the rate of change is relatively slow, and there
    are no corner cases such as wildcards.  Because of these properties,
-   [TODO: Sorry; i'm not sure what to fill in here.]
+   we know that generated negative answers will work.
 
-6.2.  Aggressive negative caching flag idea
+7.2.  Aggressive negative caching flag idea
 
    Authoritative DNS servers that dynamically generate NSEC records
    normally generate minimally covering NSEC Records [RFC4470].
@@ -458,11 +458,11 @@ Internet-Draft              NSEC/NSEC3 usage                   June 2016
    about zone information leak.  [TODO: I don't understand this
    paragraph, but it could well just be me.]
 
-7.  IANA Considerations
+8.  IANA Considerations
 
    This document has no IANA actions.
 
-8.  Security Considerations
+9.  Security Considerations
 
    Newly registered resource records may not be used immediately.
    However, choosing suitable TTL value will mitigate the delay concern,
@@ -478,13 +478,13 @@ Internet-Draft              NSEC/NSEC3 usage                   June 2016
    validation may cause security problems.  It is highly recommended to
    apply DNSSEC validation.
 
-9.  Implementation Status
+10.  Implementation Status
 
    Unbound has aggressive negative caching code in its DLV validator.
    The author implemented NSEC aggressive caching using Unbound and its
    DLV validator code.
 
-10.  Acknowledgments
+11.  Acknowledgments
 
    The authors gratefully acknowledge DLV [RFC5074] author Samuel Weiler
    and Unbound developers.  Olafur Gudmundsson and Pieter Lexis proposed
@@ -492,7 +492,7 @@ Internet-Draft              NSEC/NSEC3 usage                   June 2016
    provided by Bob Harold, Tatuya JINMEI, Shumon Huque, Mark Andrews,
    Casey Deccio, Bob Harold, Stephane Bortzmeyer and Matthijs Mekking.
 
-11.  Change History
+12.  Change History
 
    This section is used for tracking the update of this document.  Will
    be removed after finalize.
@@ -522,7 +522,7 @@ Internet-Draft              NSEC/NSEC3 usage                   June 2016
 
    o  Added Warren as co-author.
 
-11.1.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-01
+12.1.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-01
 
    o  Added reference to DLV [RFC5074] and imported some sentences.
 
@@ -530,7 +530,7 @@ Internet-Draft              NSEC/NSEC3 usage                   June 2016
 
    o  Added detailed algorithms.
 
-11.2.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-02
+12.2.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-02
 
    o  Added reference to [I-D.vixie-dnsext-resimprove]
 
@@ -541,7 +541,7 @@ Internet-Draft              NSEC/NSEC3 usage                   June 2016
    o  Moved Aggressive Negative Caching Flag idea into Additional
       Proposals
 
-11.3.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-03
+12.3.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-03
 
    o  Added "Partial implementation"
 
@@ -564,9 +564,9 @@ Fujiwara, et al.        Expires December 17, 2016              [Page 10]
 Internet-Draft              NSEC/NSEC3 usage                   June 2016
 
 
-12.  References
+13.  References
 
-12.1.  Normative References
+13.1.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/
@@ -604,7 +604,7 @@ Internet-Draft              NSEC/NSEC3 usage                   June 2016
               Terminology", RFC 7719, DOI 10.17487/RFC7719, December
               2015, <http://www.rfc-editor.org/info/rfc7719>.
 
-12.2.  Informative References
+13.2.  Informative References
 
    [BIND9]    Internet Systems Consortium, Inc., "Name Server Software",
               2000, <https://www.isc.org/downloads/bind/>.
