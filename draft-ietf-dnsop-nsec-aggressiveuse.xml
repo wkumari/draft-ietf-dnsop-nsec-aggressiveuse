@@ -308,10 +308,7 @@
         use (of NSEC) is enabled").</t>
 
         <t>Furthermore, when aggressive use of NSEC is enabled, the aggressive
-        use of cached deduced wildcard will be more effective; the aggressive
-        NSEC use helps prove more names wouldn't exist without the wildcard
-        through fewer external queries. [TODO: I cannot parse the section of
-        the prior sentence after the semicolon.]</t>
+        use of cached deduced wildcard will be more effective.</t>
 
         <t>A full-service resolver implementation MAY support aggressive use
         of wildcards. It SHOULD provide a configuration switch to disable
@@ -392,11 +389,9 @@
         implementation of NSEC aggressive negative caching which targets DLV
         domain names.</t>
 
-        <t>NSEC only aggressive negative caching is easier to implement
-        NSEC/NSEC3 aggressive negative caching (full implementation) because
-        NSEC3 handling is hard to implement. [TODO: This says, x is easier to
-        implement, because y is hard to implement. -- Add detail, or otherwise
-        fix.]</t>
+        <t>NSEC3 is somewhat more complex to implement, and some
+        implementations may choose to only implement aggressive negative
+        caching for NSEC.</t>
 
         <t>Root only aggressive negative caching is also possible. It uses
         NSEC and RRSIG resource records whose signer domain name is root.</t>
@@ -489,8 +484,6 @@
           <t>Reworded much of the problem statement</t>
 
           <t>Reworked examples to better explain the problem / solution.</t>
-
-          <t/>
         </list></t>
 
       <section anchor="version-draft-fujiwara-dnsop-nsec-aggressiveuse-01"
