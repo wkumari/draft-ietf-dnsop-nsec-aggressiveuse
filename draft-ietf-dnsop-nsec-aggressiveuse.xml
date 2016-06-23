@@ -80,38 +80,48 @@
     <keyword>Internet-Draft</keyword>
 
     <abstract>
-      <t>The DNS relies upon caching to scale; however, the fact that a name
-      does not exist requires an exact match. This document specifies the use
-      of NSEC/NSEC3 resource records to authioratively generate negative
-      answers for a range. This increases resilience to DoS attacks, increases
-      performance / decreases latency, decreases resource utilization on both
-      authoritative and recursive servers, and also increases privacy.</t>
+      <t>The DNS relies upon caching to scale; however, the cache lookup
+      generally requires an exact match. This document specifies the use of
+      NSEC/NSEC3 resource records to generate negative answers within a range.
+      This increases resilience to DoS attacks, increases performance /
+      decreases latency, decreases resource utilization on both authoritative
+      and recursive servers, and also increases privacy.</t>
+
+      <t>This document updates RFC4035 by allowing resolvers to generate
+      negative answers based upon NSEC/NSEC3 records.</t>
 
       <t>[ Ed note: Text inside square brackets ([]) is additional background
       information, answers to frequently asked questions, general musings,
-      etc. They will be removed before publication.</t>
-
-      <t>This document is being collaborated on in Github at:
+      etc. They will be removed before publication.This document is being
+      collaborated on in Github at:
       https://github.com/wkumari/draft-ietf-dnsop-nsec-aggressiveuse. The most
       recent version of the document, open issues, etc should all be available
-      here. The authors (gratefully) accept pull requests ]</t>
+      here. The authors (gratefully) accept pull requests.</t>
+
+      <t>Known / open issues [To be moved to Github issue tracker]: <list
+          style="numbers">
+          <t>We say things like: "Currently the DNS does ..." - this will not
+          be true after this is deployed, but I'm having a hard time rewording
+          this. "Without the techniques described in this document..." seems
+          klunky. Perhaps "historically?!"</t>
+        </list>]</t>
     </abstract>
   </front>
 
   <middle>
     <section anchor="introduction" title="Introduction">
-      <t>A DNS negative cache does currently exist, and is used to cache the
-      fact that a name does not exist. This method of negative caching
-      requires exact matching, which leads to unnecessary additional lookups,
-      which have negative implications for DoS survivability, increases
-      latency, leads to extra resource utilization on both authoritative and
-      recursive servers, and decreases privacy by leaking queries.</t>
+      <t>A DNS negative cache currently exists, and is used to cache the fact
+      that a name does not exist. This method of negative caching requires
+      exact matching; this leads to unnecessary additional lookups, which have
+      negative implications for DoS survivability, increases latency, leads to
+      extra resource utilization on both authoritative and recursive servers,
+      and decreases privacy by leaking queries.</t>
 
-      <t>This document proposes a minor change to RFC 4035 to allow recursive
-      resolvers to use NSEC/NSEC3 resource records to aggressively cache
-      negative answers. This would allow such resolvers to respond with
-      NXDOMAIN immediately if the name in question falls into a range
-      expressed by a NSEC/NSEC3 resource record in the cache.</t>
+      <t>This document updates RFC 4035 to allow recursive resolvers to use
+      NSEC/NSEC3 resource records to aggressively cache negative answers. This
+      would allow such resolvers to respond with NXDOMAIN immediately if the
+      name in question falls into a range expressed by a NSEC/NSEC3 resource
+      record already in the cache.</t>
 
       <t>Aggressive Negative Caching was first proposed in Section 6 of DNSSEC
       Lookaside Validation (DLV) <xref target="RFC5074"/> in order to find
@@ -156,53 +166,56 @@
         </list></t>
 
       <t>If a recursive resolver gets a query for cat.example.com, it will
-      query the authoritative servers for example.com and will get back an
-      NSEC (or NSEC3) record starting that there are no records between apple
-      and elephant. If the recursive resolver then gets a query for
-      ball.example.com it will once again go and ask the example.com servers,
-      and will get back the same NSEC/NSEC3 record - this will happen for
-      cat.example.com, dog.example.com, etc.Apart from wasting bandwidth, this
-      also wastes resources on the recursive server (it needs to keep state
-      for outstanding queries), wastes resources on the authoritative server
-      (it has to answer additional questions), increases latency (the end user
-      has to wait longer than necessary to get back an NXDOMAIN answer), can
-      be used by attackers to cause a DoS (see additional resources), and also
-      has privacy implications (e.g: typos leak out further than
-      necessary).</t>
+      query the example.com authoritative servers and will get back an NSEC
+      (or NSEC3) record starting that there are no records between apple and
+      elephant. The recursive resolver then knows that cat.example.com does
+      not exist; however, it (currently) does not use the fact that the proof
+      covers a range (apple to elephant) to suppress queries for other labels
+      that fall within this range. This means that if the recursive resolvers
+      gets a query for ball.example.com (or dog.example.com) it will once
+      again go off and query the example.com servers for these names. </t>
+
+      <t>Apart from wasting bandwidth, this also wastes resources on the
+      recursive server (it needs to keep state for outstanding queries),
+      wastes resources on the authoritative server (it has to answer
+      additional questions), increases latency (the end user has to wait
+      longer than necessary to get back an NXDOMAIN answer), can be used by
+      attackers to cause a DoS (see additional resources), and also has
+      privacy implications (e.g: typos leak out further than necessary).</t>
     </section>
 
     <section title="Background">
       <t>DNSSEC <xref target="RFC4035"/> and <xref target="RFC5155"/> both
-      provide "authenticated denial of existence"; this is a
-      (cryptographically secured) proof that the queried for name does not
-      exist - this is accomplished by providing a (DNSSEC secured) record
-      containing the names alphabetically before and after the queried for
-      name. In the example above</t>
+      provide "authenticated denial of existence"; this is a cryptographic
+      proof that the queried for name does not exist, accomplished by
+      providing a (DNSSEC secured) record containing the names which appear
+      alphabetically before and after the queried for name. In the example
+      above, if the (DNSSEC validating) recursive server were to query for
+      lion.example.com it would receive a (signed) NSEC/NSEC3 record stating
+      that there are no labels between "elephant" and "zebra". This is a
+      signed, cryptographic proof that these names are the ones before and
+      after the queried for label. As lion.example.com falls within this
+      range, the recursive server knows that lion.example.com really does not
+      exist. This document specifies that this NSEC/NSEC3 record should be
+      used to generate negative answers for any queries that the recursive
+      server receives that fall within the range covered by the record (for
+      the TTL for the record).</t>
 
-      <t>Instead, this document specifies that, if a recursive resolver gets a
-      query for a name within a range covered by an NSEC (or NSEC3) record in
-      its cache, it should immediately respond with the negative answer from
-      its cache, and should not bother sending the query to the authoritative
-      server.</t>
+      <t> <xref target="RFC4035"/>; Section 4.5 states: </t>
 
       <t>For a zone signed with NSEC, it would be possible to use the
       information carried in NSEC resource records to indicate the
       non-existence of a range of names. However, such use is discouraged by
-      Section 4.5 of RFC 4035, however. [TODO: Want to include any rationale?
-      Otherwise there might be a question of why do it here, if it was
-      (validly?) discouraged in 4.5 of RFC 4035?]</t>
-
-      <t>If the full-service resolver can use a NSEC/NSEC3 resource record to
-      prove that names within a specified range do not exist, the full-service
-      resolver can answer NXDOMAIN error immediately when the full-service
-      resolver's cache contain matching NSEC/NSEC3 RRs. In our example above,
-      this would result in the authoritative server responding that there are
-      no names below "example.com" -- if that were the response, then a
-      separate query for "b.example.com" would be unnecessary. [TODO: Is this
-      the case? If it is, then we should specify no names below example.com in
-      the first paragraph of this section, or no single-letter names, or
-      whatever the example is actually supposed to be. In short, what wildcard
-      would you be suggesting for aggressive use here? * or ? or other?]</t>
+      Section 4.5 of RFC4035. It is recommended that readers read RFC4035 in
+      its entirety for a better understanding. At the root of the concern is
+      that new records could have been added to the zone during the TTL of the
+      NSEC record, and that generating negative responses from the NSEC record
+      would hide these. We believe this recommendation can be relaxed because
+      lookups for the specific name could have come in during the normal
+      negative cache time and so operators should have no expectation that an
+      added name would work immediately. We think that the TTL of the NSEC
+      record is the authoritive statement of how quickly a name can start
+      working within a zone.</t>
     </section>
 
     <section anchor="proposed-solution" title="Proposed Solution">
@@ -246,8 +259,9 @@
       <section anchor="nsec" title="NSEC">
         <t>If a full-service resolver implementation supports aggressive
         negative caching, then it SHOULD support aggressive use of NSEC and
-        enable it by default. It SHOULD provide a configuration knob to
-        disable aggressive use of NSEC.</t>
+        enable it by default. It SHOULD provide a configuration switch to
+        disable aggressive use of NSEC and allow it to be enabled or disabled
+        for specific zones.</t>
 
         <t>The validating resolver needs to check the existence of an NSEC RR
         matching/covering the source of synthesis and an NSEC RR covering the
@@ -261,8 +275,9 @@
 
       <section anchor="nsec3" title="NSEC3">
         <t>NSEC3 aggressive negative caching is more difficult. If the zone is
-        signed with NSEC3, the validating resolver need to check the existence
-        of non-terminals and wildcards which derive from query names.</t>
+        signed with NSEC3, the validating resolver needs to check the
+        existence of non-terminals and wildcards which derive from query
+        names.</t>
 
         <t>If the full-service resolver's cache contains an NSEC3 RR matching
         the closest encloser, an NSEC3 RR covering the next closer name, and
@@ -274,8 +289,9 @@
         negative caching is not possible for the domain name.</t>
 
         <t>A full-service resolver implementation MAY support aggressive use
-        of NSEC3. It SHOULD provide a configuration knob to disable aggressive
-        use of NSEC3 in this case.</t>
+        of NSEC3. It SHOULD provide a configuration switch to disable
+        aggressive use of NSEC3 and allow it to be enabled or disabled for
+        specific zones.</t>
       </section>
 
       <section anchor="wildcard" title="Wildcard">
@@ -298,7 +314,7 @@
         the prior sentence after the semicolon.]</t>
 
         <t>A full-service resolver implementation MAY support aggressive use
-        of wildcards. It SHOULD provide a configuration knob to disable
+        of wildcards. It SHOULD provide a configuration switch to disable
         aggressive use of wildcards.</t>
       </section>
 
