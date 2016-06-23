@@ -104,6 +104,10 @@
           be true after this is deployed, but I'm having a hard time rewording
           this. "Without the techniques described in this document..." seems
           klunky. Perhaps "historically?!"</t>
+
+          <t>We currently say this SHOULD be enabled by default. Is that what
+          the working group wants, or should this be an implementation
+          choice?</t>
         </list>]</t>
     </abstract>
   </front>
