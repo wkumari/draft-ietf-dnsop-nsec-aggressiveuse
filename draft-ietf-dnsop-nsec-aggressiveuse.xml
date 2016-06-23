@@ -485,6 +485,12 @@
           <t>Simplified pseudo code for NSEC3</t>
 
           <t>Added Warren as co-author.</t>
+
+          <t>Reworded much of the problem statement</t>
+
+          <t>Reworked examples to better explain the problem / solution.</t>
+
+          <t/>
         </list></t>
 
       <section anchor="version-draft-fujiwara-dnsop-nsec-aggressiveuse-01"

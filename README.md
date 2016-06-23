@@ -117,7 +117,7 @@ Internet-Draft              NSEC/NSEC3 usage                   June 2016
 
 
      12.1.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-01 . . .  10
-     12.2.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-02 . . .  10
+     12.2.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-02 . . .  11
      12.3.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-03 . . .  11
    13. References  . . . . . . . . . . . . . . . . . . . . . . . . .  11
      13.1.  Normative References . . . . . . . . . . . . . . . . . .  11
@@ -538,6 +538,12 @@ Internet-Draft              NSEC/NSEC3 usage                   June 2016
 
    o  Added Warren as co-author.
 
+   o  Reworded much of the problem statement
+
+   o  Reworked examples to better explain the problem / solution.
+
+   o
+
 12.1.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-01
 
    o  Added reference to DLV [RFC5074] and imported some sentences.
@@ -545,6 +551,18 @@ Internet-Draft              NSEC/NSEC3 usage                   June 2016
    o  Added Aggressive Negative Caching Flag idea.
 
    o  Added detailed algorithms.
+
+
+
+
+
+
+
+
+Fujiwara, et al.        Expires December 17, 2016              [Page 10]
+
+Internet-Draft              NSEC/NSEC3 usage                   June 2016
+
 
 12.2.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-02
 
@@ -556,13 +574,6 @@ Internet-Draft              NSEC/NSEC3 usage                   June 2016
 
    o  Moved Aggressive Negative Caching Flag idea into Additional
       Proposals
-
-
-
-Fujiwara, et al.        Expires December 17, 2016              [Page 10]
-
-Internet-Draft              NSEC/NSEC3 usage                   June 2016
-
 
 12.3.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-03
 
@@ -599,6 +610,16 @@ Internet-Draft              NSEC/NSEC3 usage                   June 2016
               RFC4470, April 2006,
               <http://www.rfc-editor.org/info/rfc4470>.
 
+
+
+
+
+
+Fujiwara, et al.        Expires December 17, 2016              [Page 11]
+
+Internet-Draft              NSEC/NSEC3 usage                   June 2016
+
+
    [RFC4592]  Lewis, E., "The Role of Wildcards in the Domain Name
               System", RFC 4592, DOI 10.17487/RFC4592, July 2006,
               <http://www.rfc-editor.org/info/rfc4592>.
@@ -611,14 +632,6 @@ Internet-Draft              NSEC/NSEC3 usage                   June 2016
               Security (DNSSEC) Hashed Authenticated Denial of
               Existence", RFC 5155, DOI 10.17487/RFC5155, March 2008,
               <http://www.rfc-editor.org/info/rfc5155>.
-
-
-
-
-Fujiwara, et al.        Expires December 17, 2016              [Page 11]
-
-Internet-Draft              NSEC/NSEC3 usage                   June 2016
-
 
    [RFC7719]  Hoffman, P., Sullivan, A., and K. Fujiwara, "DNS
               Terminology", RFC 7719, DOI 10.17487/RFC7719, December
@@ -655,6 +668,14 @@ Appendix A.  Aggressive negative caching from RFC 5074
    Previously, cached negative responses were indexed by QNAME, QCLASS,
    QTYPE, and the setting of the CD bit (see RFC 4035, Section 4.7), and
    only queries matching the index key would be answered from the cache.
+
+
+
+Fujiwara, et al.        Expires December 17, 2016              [Page 12]
+
+Internet-Draft              NSEC/NSEC3 usage                   June 2016
+
+
    With aggressive negative caching, the validator, in addition to
    checking to see if the answer is in its cache before sending a query,
    checks to see whether any cached and validated NSEC record denies the
@@ -667,14 +688,6 @@ Appendix A.  Aggressive negative caching from RFC 5074
    NSEC in its cache unless the CD bit was set on the incoming query.
 
    Imported from Section 6.1 of [RFC5074].
-
-
-
-
-Fujiwara, et al.        Expires December 17, 2016              [Page 12]
-
-Internet-Draft              NSEC/NSEC3 usage                   June 2016
-
 
    Implementing aggressive negative caching suggests that a validator
    will need to build an ordered data structure of NSEC records in order
@@ -711,6 +724,14 @@ Appendix B.  Detailed implementation idea
    }
 
    // if NSEC* exists, QTYPE existence is proved by type bitmap
+
+
+
+Fujiwara, et al.        Expires December 17, 2016              [Page 13]
+
+Internet-Draft              NSEC/NSEC3 usage                   June 2016
+
+
    if (matching NSEC/NSEC3 of QNAME exists in the cache) {
        if (QTYPE exists in type bitmap of NSEC/NSEC3 of QNAME) {
            // the entry exists, however, it is not in the cache.
@@ -724,14 +745,6 @@ Appendix B.  Detailed implementation idea
 
    // Find closest enclosing NS RRset in the cache.
    // The owner of this NS RRset will be a suffix of the QNAME
-
-
-
-Fujiwara, et al.        Expires December 17, 2016              [Page 13]
-
-Internet-Draft              NSEC/NSEC3 usage                   June 2016
-
-
    //    - the longest suffix of any NS RRset in the cache.
    SIGNER = closest enclosing NS RRSet of QNAME in the cache;
 
@@ -768,6 +781,13 @@ Internet-Draft              NSEC/NSEC3 usage                   June 2016
        //*.LongestExistName may exist. cannot generate negative response
        Resolve the query as usual.
 
+
+
+Fujiwara, et al.        Expires December 17, 2016              [Page 14]
+
+Internet-Draft              NSEC/NSEC3 usage                   June 2016
+
+
    } else
    if (SIGNER zone is signed with NSEC3) {
        // NSEC3 mode
@@ -779,14 +799,6 @@ Internet-Draft              NSEC/NSEC3 usage                   June 2016
 
        NextCloserName = the next closer name of QNAME
        SourceOfSyhthesis = *.ClosestEncloser
-
-
-
-
-Fujiwara, et al.        Expires December 17, 2016              [Page 14]
-
-Internet-Draft              NSEC/NSEC3 usage                   June 2016
-
 
        if (matching NSEC3 of ClosestEncloser exists in the cache
            and
@@ -825,6 +837,13 @@ Authors' Addresses
    Email: fujiwara@jprs.co.jp
 
 
+
+
+Fujiwara, et al.        Expires December 17, 2016              [Page 15]
+
+Internet-Draft              NSEC/NSEC3 usage                   June 2016
+
+
    Akira Kato
    Keio University/WIDE Project
    Graduate School of Media Design, 4-1-1 Hiyoshi
@@ -835,15 +854,6 @@ Authors' Addresses
    Email: kato@wide.ad.jp
 
 
-
-
-
-
-Fujiwara, et al.        Expires December 17, 2016              [Page 15]
-
-Internet-Draft              NSEC/NSEC3 usage                   June 2016
-
-
    Warren Kumari
    Google
    1600 Amphitheatre Parkway
@@ -851,16 +861,6 @@ Internet-Draft              NSEC/NSEC3 usage                   June 2016
    US
 
    Email: warren@kumari.net
-
-
-
-
-
-
-
-
-
-
 
 
 
