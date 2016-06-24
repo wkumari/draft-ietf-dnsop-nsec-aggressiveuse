@@ -104,9 +104,9 @@ Table of Contents
      5.3.  NSEC3 . . . . . . . . . . . . . . . . . . . . . . . . . .   6
      5.4.  Wildcard  . . . . . . . . . . . . . . . . . . . . . . . .   7
      5.5.  Consideration on TTL  . . . . . . . . . . . . . . . . . .   7
-   6.  Possible side effects . . . . . . . . . . . . . . . . . . . .   7
+   6.  Effects . . . . . . . . . . . . . . . . . . . . . . . . . . .   7
      6.1.  Decrease of root DNS server queries . . . . . . . . . . .   7
-     6.2.  Possible mitigation of random subdomain attacks . . . . .   8
+     6.2.  Mitigation of random subdomain attacks  . . . . . . . . .   8
    7.  Additional proposals  . . . . . . . . . . . . . . . . . . . .   8
 
 
@@ -120,11 +120,11 @@ Internet-Draft              NSEC/NSEC3 usage                   June 2016
      7.2.  Aggressive negative caching flag idea . . . . . . . . . .   9
    8.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   9
    9.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
-   10. Implementation Status . . . . . . . . . . . . . . . . . . . .  10
+   10. Implementation Status . . . . . . . . . . . . . . . . . . . .   9
    11. Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .  10
    12. Change History  . . . . . . . . . . . . . . . . . . . . . . .  10
      12.1.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-01 . . .  10
-     12.2.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-02 . . .  11
+     12.2.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-02 . . .  10
      12.3.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-03 . . .  11
    13. References  . . . . . . . . . . . . . . . . . . . . . . . . .  11
      13.1.  Normative References . . . . . . . . . . . . . . . . . .  11
@@ -373,13 +373,14 @@ Internet-Draft              NSEC/NSEC3 usage                   June 2016
    document, since it can eliminate significant amount of DNS attacks
    with randomly generated names.
 
-6.  Possible side effects
+6.  Effects
 
 6.1.  Decrease of root DNS server queries
 
-   Aggressive use of NSEC/NSEC3 resource records may decrease queries to
-   Root DNS servers.  [TODO: Make clear this is a feature, not a bug :-P
-   ]
+   Aggressive use of NSEC/NSEC3 resource records results in a decrease
+   of queries to the root - this decreases load on the root servers (the
+   majority of queries currently result in NXDOMAIN responses), and
+   increases privacy.
 
    People may generate many typos in TLD, and they will result in
    unnecessary DNS queries.  Some implementations leak non-existent TLD
@@ -387,7 +388,6 @@ Internet-Draft              NSEC/NSEC3 usage                   June 2016
    observed examples are ".local" and ".belkin".  With this proposal, it
    is possible to return NXDOMAIN immediately to such queries without
    further DNS recursive resolution process.  It may reduces round trip
-
 
 
 
@@ -399,7 +399,7 @@ Internet-Draft              NSEC/NSEC3 usage                   June 2016
    time, as well as reduces the DNS queries to corresponding
    authoritative servers, including Root DNS servers.
 
-6.2.  Possible mitigation of random subdomain attacks
+6.2.  Mitigation of random subdomain attacks
 
    Random sub-domain attacks (referred to as "Water Torture" attacks or
    NXDomain attacks) send many queries for non-existent information to
@@ -471,12 +471,7 @@ Internet-Draft              NSEC/NSEC3 usage                   June 2016
    the aggressive negative caching and a query has the aggressive
    negative caching flag, authoritative DNS servers can generate NSEC
    resource records with wider range under random subdomain attacks.
-
-   However, changing the range of minimally covering NSEC Records may be
-   implemented by detecting attacks.  Authoritative DNS servers can
-   answer any range of minimally covering NSEC Records with attention
-   about zone information leak.  [TODO: I don't understand this
-   paragraph, but it could well just be me.]
+   However, anyone (including attackers) can always use the flag..
 
 8.  IANA Considerations
 
@@ -498,6 +493,11 @@ Internet-Draft              NSEC/NSEC3 usage                   June 2016
    validation may cause security problems.  It is highly recommended to
    apply DNSSEC validation.
 
+10.  Implementation Status
+
+   Unbound has aggressive negative caching code in its DLV validator.
+   The author implemented NSEC aggressive caching using Unbound and its
+   DLV validator code.
 
 
 
@@ -507,12 +507,6 @@ Fujiwara, et al.        Expires December 17, 2016               [Page 9]
 
 Internet-Draft              NSEC/NSEC3 usage                   June 2016
 
-
-10.  Implementation Status
-
-   Unbound has aggressive negative caching code in its DLV validator.
-   The author implemented NSEC aggressive caching using Unbound and its
-   DLV validator code.
 
 11.  Acknowledgments
 
@@ -556,6 +550,12 @@ Internet-Draft              NSEC/NSEC3 usage                   June 2016
 
    o  Added detailed algorithms.
 
+12.2.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-02
+
+   o  Added reference to [I-D.vixie-dnsext-resimprove]
+
+   o  Added considerations for the CD bit
+
 
 
 
@@ -563,12 +563,6 @@ Fujiwara, et al.        Expires December 17, 2016              [Page 10]
 
 Internet-Draft              NSEC/NSEC3 usage                   June 2016
 
-
-12.2.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-02
-
-   o  Added reference to [I-D.vixie-dnsext-resimprove]
-
-   o  Added considerations for the CD bit
 
    o  Updated detailed algorithms.
 
@@ -610,7 +604,13 @@ Internet-Draft              NSEC/NSEC3 usage                   June 2016
               RFC4470, April 2006,
               <http://www.rfc-editor.org/info/rfc4470>.
 
+   [RFC4592]  Lewis, E., "The Role of Wildcards in the Domain Name
+              System", RFC 4592, DOI 10.17487/RFC4592, July 2006,
+              <http://www.rfc-editor.org/info/rfc4592>.
 
+   [RFC5074]  Weiler, S., "DNSSEC Lookaside Validation (DLV)", RFC 5074,
+              DOI 10.17487/RFC5074, November 2007,
+              <http://www.rfc-editor.org/info/rfc5074>.
 
 
 
@@ -619,14 +619,6 @@ Fujiwara, et al.        Expires December 17, 2016              [Page 11]
 
 Internet-Draft              NSEC/NSEC3 usage                   June 2016
 
-
-   [RFC4592]  Lewis, E., "The Role of Wildcards in the Domain Name
-              System", RFC 4592, DOI 10.17487/RFC4592, July 2006,
-              <http://www.rfc-editor.org/info/rfc4592>.
-
-   [RFC5074]  Weiler, S., "DNSSEC Lookaside Validation (DLV)", RFC 5074,
-              DOI 10.17487/RFC5074, November 2007,
-              <http://www.rfc-editor.org/info/rfc5074>.
 
    [RFC5155]  Laurie, B., Sisson, G., Arends, R., and D. Blacka, "DNS
               Security (DNSSEC) Hashed Authenticated Denial of
@@ -668,14 +660,6 @@ Appendix A.  Aggressive negative caching from RFC 5074
    Previously, cached negative responses were indexed by QNAME, QCLASS,
    QTYPE, and the setting of the CD bit (see RFC 4035, Section 4.7), and
    only queries matching the index key would be answered from the cache.
-
-
-
-Fujiwara, et al.        Expires December 17, 2016              [Page 12]
-
-Internet-Draft              NSEC/NSEC3 usage                   June 2016
-
-
    With aggressive negative caching, the validator, in addition to
    checking to see if the answer is in its cache before sending a query,
    checks to see whether any cached and validated NSEC record denies the
@@ -684,6 +668,14 @@ Internet-Draft              NSEC/NSEC3 usage                   June 2016
    Using aggressive negative caching, a validator will not make queries
    for any name covered by a cached and validated NSEC record.
    Furthermore, a validator answering queries from clients will
+
+
+
+Fujiwara, et al.        Expires December 17, 2016              [Page 12]
+
+Internet-Draft              NSEC/NSEC3 usage                   June 2016
+
+
    synthesize a negative answer whenever it has an applicable validated
    NSEC in its cache unless the CD bit was set on the incoming query.
 
@@ -724,14 +716,6 @@ Appendix B.  Detailed implementation idea
    }
 
    // if NSEC* exists, QTYPE existence is proved by type bitmap
-
-
-
-Fujiwara, et al.        Expires December 17, 2016              [Page 13]
-
-Internet-Draft              NSEC/NSEC3 usage                   June 2016
-
-
    if (matching NSEC/NSEC3 of QNAME exists in the cache) {
        if (QTYPE exists in type bitmap of NSEC/NSEC3 of QNAME) {
            // the entry exists, however, it is not in the cache.
@@ -740,6 +724,14 @@ Internet-Draft              NSEC/NSEC3 usage                   June 2016
        } else {
            // QNAME exists, QTYPE does not exist.
            the resolver can generate NODATA response;
+
+
+
+Fujiwara, et al.        Expires December 17, 2016              [Page 13]
+
+Internet-Draft              NSEC/NSEC3 usage                   June 2016
+
+
        }
    }
 
@@ -781,13 +773,6 @@ Internet-Draft              NSEC/NSEC3 usage                   June 2016
        //*.LongestExistName may exist. cannot generate negative response
        Resolve the query as usual.
 
-
-
-Fujiwara, et al.        Expires December 17, 2016              [Page 14]
-
-Internet-Draft              NSEC/NSEC3 usage                   June 2016
-
-
    } else
    if (SIGNER zone is signed with NSEC3) {
        // NSEC3 mode
@@ -795,6 +780,14 @@ Internet-Draft              NSEC/NSEC3 usage                   June 2016
        ClosestEncloser = Find the closest encloser of QNAME
                                              from the cache
        // to prove the non-existence of QNAME,
+
+
+
+Fujiwara, et al.        Expires December 17, 2016              [Page 14]
+
+Internet-Draft              NSEC/NSEC3 usage                   June 2016
+
+
        // closest encloser of QNAME must be in the cache
 
        NextCloserName = the next closer name of QNAME
@@ -835,6 +828,13 @@ Authors' Addresses
 
    Phone: +81 3 5215 8451
    Email: fujiwara@jprs.co.jp
+
+
+
+
+
+
+
 
 
 

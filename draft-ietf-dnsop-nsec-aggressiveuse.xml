@@ -332,12 +332,13 @@
       </section>
     </section>
 
-    <section anchor="possible-side-effects" title="Possible side effects">
+    <section anchor="possible-side-effects" title="Effects">
       <section anchor="decrease-of-root-dns-server-queries"
                title="Decrease of root DNS server queries">
-        <t>Aggressive use of NSEC/NSEC3 resource records may decrease queries
-        to Root DNS servers. [TODO: Make clear this is a feature, not a bug
-        :-P ]</t>
+        <t>Aggressive use of NSEC/NSEC3 resource records results in a decrease
+        of queries to the root - this decreases load on the root servers (the
+        majority of queries currently result in NXDOMAIN responses), and
+        increases privacy.</t>
 
         <t>People may generate many typos in TLD, and they will result in
         unnecessary DNS queries. Some implementations leak non-existent TLD
@@ -350,7 +351,7 @@
       </section>
 
       <section anchor="possible-mitigation-of-random-subdomain-attacks"
-               title="Possible mitigation of random subdomain attacks">
+               title="Mitigation of random subdomain attacks">
         <t>Random sub-domain attacks (referred to as "Water Torture" attacks
         or NXDomain attacks) send many queries for non-existent information to
         full-service resolvers. Their query names consist of random prefixes
@@ -420,13 +421,8 @@
         supporting the aggressive negative caching and a query has the
         aggressive negative caching flag, authoritative DNS servers can
         generate NSEC resource records with wider range under random subdomain
-        attacks.</t>
-
-        <t>However, changing the range of minimally covering NSEC Records may
-        be implemented by detecting attacks. Authoritative DNS servers can
-        answer any range of minimally covering NSEC Records with attention
-        about zone information leak. [TODO: I don't understand this paragraph,
-        but it could well just be me.]</t>
+        attacks. However, anyone (including attackers) can always use the
+        flag..</t>
       </section>
     </section>
 
