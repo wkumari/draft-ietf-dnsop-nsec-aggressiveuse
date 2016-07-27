@@ -6,7 +6,7 @@
 <?rfc tocdepth="4"?>
 <?rfc sortrefs="yes"?>
 <?rfc symrefs="yes"?>
-<rfc category="info" docName="draft-ietf-dnsop-nsec-aggressiveuse-00"
+<rfc category="std" docName="draft-ietf-dnsop-nsec-aggressiveuse-01"
      ipr="trust200902" updates="4035">
   <front>
     <title abbrev="NSEC/NSEC3 usage">Aggressive use of NSEC/NSEC3</title>
@@ -364,7 +364,8 @@
         outstanding queues are filled up.</t>
 
         <t>For example, BIND 9.10.2 <xref target="BIND9"/> full-service
-        resolvers answer SERVFAIL and Unbound 1.5.2 full-service resolvers
+        resolvers answer SERVFAIL and Unbound 1.5.2 <xref target="UNBOUND"/>
+        full-service resolvers
         drop most of queries under 10,000 queries per second attack.</t>
 
         <t>The countermeasures implemented at this moment are rate limiting
@@ -424,6 +425,30 @@
         attacks. However, anyone (including attackers) can always use the
         flag..</t>
       </section>
+    </section>
+
+    <section title="Update to RFC 4035" anchor="update">
+
+        <t>Section 4.5 of <xref target="RFC4035"/> shows that "In theory, a
+        resolver could use wildcards or NSEC RRs to generate positive and
+        negative responses (respectively) until the TTL or signatures on the
+        records in question expire. However, it seems prudent for resolvers to
+        avoid blocking new authoritative data or synthesizing new data on
+        their own. Resolvers that follow this recommendation will have a more
+        consistent view of the namespace".</t>
+
+        <t>(If approved, ) The paragraph is updated as follows:</t>
+
+        <figure>
+          <artwork><![CDATA[
++--------------------------------------------------------------+
+|  Once the records are validated, DNSSEC enabled full-service |
+|  resolvers MAY use wildcards and NSEC/NSEC3 resource records |
+|  to generate (positive and) negative responses until their   |
+|  effective TTLs or signatures for those records expire.      |
++--------------------------------------------------------------+
+]]></artwork>
+        </figure>
     </section>
 
     <section anchor="ianacons" title="IANA Considerations">
