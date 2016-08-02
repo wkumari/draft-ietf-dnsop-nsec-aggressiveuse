@@ -73,7 +73,7 @@
       </address>
     </author>
 
-    <date day="27" month="June" year="2016"/>
+    <date day="01" month="August" year="2016"/>
 
     <area>operations</area>
 
@@ -104,10 +104,6 @@
           be true after this is deployed, but I'm having a hard time rewording
           this. "Without the techniques described in this document..." seems
           klunky. Perhaps "historically?!"</t>
-
-          <t>We currently say this SHOULD be enabled by default. Is that what
-          the working group wants, or should this be an implementation
-          choice?</t>
         </list>]</t>
     </abstract>
   </front>
@@ -177,7 +173,7 @@
       covers a range (apple to elephant) to suppress queries for other labels
       that fall within this range. This means that if the recursive resolvers
       gets a query for ball.example.com (or dog.example.com) it will once
-      again go off and query the example.com servers for these names. </t>
+      again go off and query the example.com servers for these names.</t>
 
       <t>Apart from wasting bandwidth, this also wastes resources on the
       recursive server (it needs to keep state for outstanding queries),
@@ -205,7 +201,7 @@
       server receives that fall within the range covered by the record (for
       the TTL for the record).</t>
 
-      <t> <xref target="RFC4035"/>; Section 4.5 states: </t>
+      <t><xref target="RFC4035"/>; Section 4.5 states:</t>
 
       <t>For a zone signed with NSEC, it would be possible to use the
       information carried in NSEC resource records to indicate the
@@ -218,7 +214,7 @@
       lookups for the specific name could have come in during the normal
       negative cache time and so operators should have no expectation that an
       added name would work immediately. We think that the TTL of the NSEC
-      record is the authoritive statement of how quickly a name can start
+      record is the authoritative statement of how quickly a name can start
       working within a zone.</t>
     </section>
 
@@ -235,8 +231,7 @@
         their own. Resolvers that follow this recommendation will have a more
         consistent view of the namespace".</t>
 
-        <t>To reduce non-existent queries sent to authoritative DNS servers,
-        this restriction could be relaxed, as follows:</t>
+        <t>This document relaxes this this restriction, as follows:</t>
 
         <figure>
           <artwork><![CDATA[
@@ -249,13 +244,13 @@
 ]]></artwork>
         </figure>
 
-        <t>If the full-service resolver's cache have enough information to
+        <t>If the full-service resolver's cache has sufficent information to
         validate the query, the full-service resolver MAY use
         NSEC/NSEC3/wildcard records aggressively. Otherwise, the full-service
         resolver MUST fall back to send the query to the authoritative DNS
         servers.</t>
 
-        <t>If the query name has the matching NSEC/NSEC3 RR and it proves the
+        <t>If the query name has the matching NSEC/NSEC3 RR proving the
         information requested does not exist, the full-service resolver may
         respond with a NODATA (empty) answer.</t>
       </section>
@@ -293,9 +288,9 @@
         negative caching is not possible for the domain name.</t>
 
         <t>A full-service resolver implementation MAY support aggressive use
-        of NSEC3. It SHOULD provide a configuration switch to disable
-        aggressive use of NSEC3 and allow it to be enabled or disabled for
-        specific zones.</t>
+        of NSEC3. If it does aggressive use of NSEC3, it SHOULD provide a
+        configuration switch to disable aggressive use of NSEC3 and allow it
+        to be enabled or disabled for specific zones.</t>
       </section>
 
       <section anchor="wildcard" title="Wildcard">
@@ -304,12 +299,12 @@
         recommends that it is not relied upon.</t>
 
         <t>Just like the case for the aggressive use of NSEC discussed in this
-        draft, we could revisit this recommendation. As long as the
-        full-service resolver knows a name would not exist without the
-        wildcard match, it could answer a query for that name using the cached
-        deduced wildcard, and it may be justified for performance and other
-        benefits. (Note that, so far, this is orthogonal to "when aggressive
-        use (of NSEC) is enabled").</t>
+        draft, we revise this recommendation. As long as the full-service
+        resolver knows a name would not exist without the wildcard match, it
+        can answer a query for that name using the cached deduced wildcard,
+        and it may be justified for performance and other benefits. (Note
+        that, so far, this is orthogonal to "when aggressive use (of NSEC) is
+        enabled").</t>
 
         <t>Furthermore, when aggressive use of NSEC is enabled, the aggressive
         use of cached deduced wildcard will be more effective.</t>
@@ -322,13 +317,11 @@
       <section anchor="consideration-on-ttl" title="Consideration on TTL">
         <t>The TTL value of negative information is especially important,
         because newly added domain names cannot be used while the negative
-        information is effective. Section 5 of RFC 2308 states the maximum
-        number of negative cache TTL value is 3 hours (10800). So the
-        full-service resolver SHOULD limit the maximum effective TTL value of
-        negative responses (NSEC/NSEC3 RRs) to 10800 (3 hours). It is
-        reasonably small but still effective for the purpose of this document,
-        since it can eliminate significant amount of DNS attacks with randomly
-        generated names.</t>
+        information is effective. Section 5 of RFC 2308 states that the
+        maximum number of negative cache TTL value is 3 hours (10800). It is
+        RECOMMENDED that full-service resolvers limit the maximum effective
+        TTL value of negative responses (NSEC/NSEC3 RRs) to this same
+        value.</t>
       </section>
     </section>
 
@@ -365,8 +358,8 @@
 
         <t>For example, BIND 9.10.2 <xref target="BIND9"/> full-service
         resolvers answer SERVFAIL and Unbound 1.5.2 <xref target="UNBOUND"/>
-        full-service resolvers
-        drop most of queries under 10,000 queries per second attack.</t>
+        full-service resolvers drop most of queries under 10,000 queries per
+        second attack.</t>
 
         <t>The countermeasures implemented at this moment are rate limiting
         and disabling name resolution of target domain names in ad-hoc
@@ -423,24 +416,23 @@
         aggressive negative caching flag, authoritative DNS servers can
         generate NSEC resource records with wider range under random subdomain
         attacks. However, anyone (including attackers) can always use the
-        flag..</t>
+        flag.. </t>
       </section>
     </section>
 
-    <section title="Update to RFC 4035" anchor="update">
+    <section anchor="update" title="Update to RFC 4035">
+      <t>Section 4.5 of <xref target="RFC4035"/> shows that "In theory, a
+      resolver could use wildcards or NSEC RRs to generate positive and
+      negative responses (respectively) until the TTL or signatures on the
+      records in question expire. However, it seems prudent for resolvers to
+      avoid blocking new authoritative data or synthesizing new data on their
+      own. Resolvers that follow this recommendation will have a more
+      consistent view of the namespace".</t>
 
-        <t>Section 4.5 of <xref target="RFC4035"/> shows that "In theory, a
-        resolver could use wildcards or NSEC RRs to generate positive and
-        negative responses (respectively) until the TTL or signatures on the
-        records in question expire. However, it seems prudent for resolvers to
-        avoid blocking new authoritative data or synthesizing new data on
-        their own. Resolvers that follow this recommendation will have a more
-        consistent view of the namespace".</t>
+      <t>(If approved, ) The paragraph is updated as follows:</t>
 
-        <t>(If approved, ) The paragraph is updated as follows:</t>
-
-        <figure>
-          <artwork><![CDATA[
+      <figure>
+        <artwork><![CDATA[
 +--------------------------------------------------------------+
 |  Once the records are validated, DNSSEC enabled full-service |
 |  resolvers MAY use wildcards and NSEC/NSEC3 resource records |
@@ -448,7 +440,7 @@
 |  effective TTLs or signatures for those records expire.      |
 +--------------------------------------------------------------+
 ]]></artwork>
-        </figure>
+      </figure>
     </section>
 
     <section anchor="ianacons" title="IANA Considerations">
@@ -487,8 +479,21 @@
     </section>
 
     <section anchor="change-history" title="Change History">
-      <t>This section is used for tracking the update of this document. Will
-      be removed after finalize.</t>
+      <t>RFC Editor: Please remove this section prior to publication.</t>
+
+      <t>-00 to -01:<list style="symbols">
+          <t>Comments from DNSOP meeting in Berlin.</t>
+
+          <t>Changed intended status to Standards Track (updates RFC 4035)</t>
+
+          <t>Added a section "Updates to RFC 4035"</t>
+
+          <t>Added a reference to "UNBOUND"</t>
+
+          <t>Some language clarification / typo / cleanup</t>
+
+          <t>Cleaned up the TTL section a bit.</t>
+        </list></t>
 
       <t>From draft-fujiwara-dnsop-nsec-aggressiveuse-03 -&gt;
       draft-ietf-dnsop-nsec-aggressiveuse<list style="symbols">
