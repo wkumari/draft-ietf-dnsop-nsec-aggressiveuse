@@ -73,7 +73,7 @@
       </address>
     </author>
 
-    <date day="01" month="August" year="2016"/>
+    <date day="02" month="August" year="2016"/>
 
     <area>operations</area>
 
@@ -244,7 +244,7 @@
 ]]></artwork>
         </figure>
 
-        <t>If the full-service resolver's cache has sufficent information to
+        <t>If the full-service resolver's cache has sufficient information to
         validate the query, the full-service resolver MAY use
         NSEC/NSEC3/wildcard records aggressively. Otherwise, the full-service
         resolver MUST fall back to send the query to the authoritative DNS
@@ -325,101 +325,6 @@
       </section>
     </section>
 
-    <section anchor="possible-side-effects" title="Effects">
-      <section anchor="decrease-of-root-dns-server-queries"
-               title="Decrease of root DNS server queries">
-        <t>Aggressive use of NSEC/NSEC3 resource records results in a decrease
-        of queries to the root - this decreases load on the root servers (the
-        majority of queries currently result in NXDOMAIN responses), and
-        increases privacy.</t>
-
-        <t>People may generate many typos in TLD, and they will result in
-        unnecessary DNS queries. Some implementations leak non-existent TLD
-        queries whose second level domain are different each other. Well
-        observed examples are ".local" and ".belkin". With this proposal, it
-        is possible to return NXDOMAIN immediately to such queries without
-        further DNS recursive resolution process. It may reduces round trip
-        time, as well as reduces the DNS queries to corresponding
-        authoritative servers, including Root DNS servers.</t>
-      </section>
-
-      <section anchor="possible-mitigation-of-random-subdomain-attacks"
-               title="Mitigation of random subdomain attacks">
-        <t>Random sub-domain attacks (referred to as "Water Torture" attacks
-        or NXDomain attacks) send many queries for non-existent information to
-        full-service resolvers. Their query names consist of random prefixes
-        and a target domain name. The negative cache does not work well, and
-        thus targeted full-service resolvers end up sending queries to
-        authoritative DNS servers of the target domain name.</t>
-
-        <t>When the number of queries is large, the full-service resolvers
-        drop queries from both legitimate users and attackers as their
-        outstanding queues are filled up.</t>
-
-        <t>For example, BIND 9.10.2 <xref target="BIND9"/> full-service
-        resolvers answer SERVFAIL and Unbound 1.5.2 <xref target="UNBOUND"/>
-        full-service resolvers drop most of queries under 10,000 queries per
-        second attack.</t>
-
-        <t>The countermeasures implemented at this moment are rate limiting
-        and disabling name resolution of target domain names in ad-hoc
-        manner.</t>
-
-        <t>If the full-service resolver supports aggressive negative caching
-        and the target domain name is signed with NSEC/NSEC3 (without
-        Opt-Out), it may be used as a possible countermeasure of random
-        subdomain attacks.</t>
-
-        <t>However, attackers can set the CD bit to their attack queries. The
-        CD bit disables signature validation and the aggressive negative
-        caching will be of no use.</t>
-      </section>
-    </section>
-
-    <section anchor="additional-proposals" title="Additional proposals">
-      <t>There are additional proposals to the aggressive negative
-      caching.</t>
-
-      <section anchor="partial-implementation" title="Partial implementation">
-        <t>It is possible to implement aggressive negative caching
-        partially.</t>
-
-        <t>DLV aggressive negative caching <xref target="RFC5074"/> is an
-        implementation of NSEC aggressive negative caching which targets DLV
-        domain names.</t>
-
-        <t>NSEC3 is somewhat more complex to implement, and some
-        implementations may choose to only implement aggressive negative
-        caching for NSEC.</t>
-
-        <t>Root only aggressive negative caching is also possible. It uses
-        NSEC and RRSIG resource records whose signer domain name is root.</t>
-
-        <t><xref target="I-D.wkumari-dnsop-cheese-shop"/> proposed root only
-        aggressive negative caching in order to decrease defects and
-        standardize quickly. The root zone has certain properties that make it
-        a special case: It is DNSSEC signed and uses NSEC, the majority of the
-        queries are "junk" queries, the rate of change is relatively slow, and
-        there are no corner cases such as wildcards. Because of these
-        properties, we know that generated negative answers will work.</t>
-      </section>
-
-      <section anchor="aggressive-negative-caching-flag-idea"
-               title="Aggressive negative caching flag idea">
-        <t>Authoritative DNS servers that dynamically generate NSEC records
-        normally generate minimally covering NSEC Records <xref
-        target="RFC4470"/>. Aggressive negative caching does not work with
-        minimally covering NSEC records. Most of DNS operators don't want zone
-        enumeration and zone information leaks. They prefer NSEC resource
-        records with narrow ranges. When a flag shows a full-service resolver
-        supporting the aggressive negative caching and a query has the
-        aggressive negative caching flag, authoritative DNS servers can
-        generate NSEC resource records with wider range under random subdomain
-        attacks. However, anyone (including attackers) can always use the
-        flag.. </t>
-      </section>
-    </section>
-
     <section anchor="update" title="Update to RFC 4035">
       <t>Section 4.5 of <xref target="RFC4035"/> shows that "In theory, a
       resolver could use wildcards or NSEC RRs to generate positive and
@@ -449,7 +354,8 @@
 
     <section anchor="securitycons" title="Security Considerations">
       <t>Newly registered resource records may not be used immediately.
-      However, choosing suitable TTL value will mitigate the delay concern,
+      However, choosing suitable TTL value and negative cache TTL value
+      (SOA MINIMUM field) will mitigate the delay concern,
       and it is not a security problem.</t>
 
       <t>It is also suggested to limit the maximum TTL value of NSEC / NSEC3
@@ -471,9 +377,11 @@
 
     <section anchor="acknowledgments" title="Acknowledgments">
       <t>The authors gratefully acknowledge DLV <xref target="RFC5074"/>
-      author Samuel Weiler and Unbound developers. Olafur Gudmundsson and
-      Pieter Lexis proposed aggressive negative caching flag idea. Valuable
-      comments were provided by Bob Harold, Tatuya JINMEI, Shumon Huque, Mark
+      author Samuel Weiler and Unbound developers.
+      Valuable
+      comments were provided by
+      Olafur Gudmundsson, Pieter Lexis,
+      Bob Harold, Tatuya JINMEI, Shumon Huque, Mark
       Andrews, Casey Deccio, Bob Harold, Stephane Bortzmeyer and Matthijs
       Mekking.</t>
     </section>
@@ -488,11 +396,13 @@
 
           <t>Added a section "Updates to RFC 4035"</t>
 
-          <t>Added a reference to "UNBOUND"</t>
-
           <t>Some language clarification / typo / cleanup</t>
 
           <t>Cleaned up the TTL section a bit.</t>
+
+	  <t>Removed Effects section, Additional proposal section, and pseudo code.</t>
+	  <t>Moved "mitigaton of random subdomain attacks" to Appendix.</t>
+
         </list></t>
 
       <t>From draft-fujiwara-dnsop-nsec-aggressiveuse-03 -&gt;
@@ -759,37 +669,6 @@
         <seriesInfo name="DOI" value="10.17487/RFC5074"/>
       </reference>
 
-      <reference anchor="RFC4470"
-                 target="http://www.rfc-editor.org/info/rfc4470">
-        <front>
-          <title>Minimally Covering NSEC Records and DNSSEC On-line
-          Signing</title>
-
-          <author fullname="S. Weiler" initials="S." surname="Weiler">
-            <organization/>
-          </author>
-
-          <author fullname="J. Ihren" initials="J." surname="Ihren">
-            <organization/>
-          </author>
-
-          <date month="April" year="2006"/>
-
-          <abstract>
-            <t>This document describes how to construct DNSSEC NSEC resource
-            records that cover a smaller range of names than called for by RFC
-            4034. By generating and signing these records on demand,
-            authoritative name servers can effectively stop the disclosure of
-            zone contents otherwise made possible by walking the chain of NSEC
-            records in a signed zone. [STANDARDS-TRACK]</t>
-          </abstract>
-        </front>
-
-        <seriesInfo name="RFC" value="4470"/>
-
-        <seriesInfo name="DOI" value="10.17487/RFC4470"/>
-      </reference>
-
       <reference anchor="RFC7719"
                  target="http://www.rfc-editor.org/info/rfc7719">
         <front>
@@ -826,29 +705,6 @@
     </references>
 
     <references title="Informative References">
-      <reference anchor="UNBOUND" target="http://www.unbound.net/">
-        <front>
-          <title>Unbound DNS validating resolver</title>
-
-          <author>
-            <organization>NLnet Labs</organization>
-          </author>
-
-          <date year="2006"/>
-        </front>
-      </reference>
-
-      <reference anchor="BIND9" target="https://www.isc.org/downloads/bind/">
-        <front>
-          <title>Name Server Software</title>
-
-          <author>
-            <organization>Internet Systems Consortium, Inc.</organization>
-          </author>
-
-          <date year="2000"/>
-        </front>
-      </reference>
 
       <reference anchor="I-D.vixie-dnsext-resimprove">
         <front>
@@ -920,79 +776,34 @@
                 type="TXT"/>
       </reference>
 
-      <reference anchor="I-D.wkumari-dnsop-cheese-shop">
-        <front>
-          <title>Believing NSEC records in the DNS root.</title>
-
-          <author fullname="Warren Kumari" initials="W" surname="Kumari">
-            <organization/>
-          </author>
-
-          <author fullname="Geoff Huston" initials="G" surname="Huston">
-            <organization/>
-          </author>
-
-          <date day="23" month="February" year="2016"/>
-
-          <abstract>
-            <t>This document describes a method to generate negative answers
-            from NSEC records for the special case of the DNS root. This
-            improves performance; the resolver can answer immediatly, and does
-            not need to query the root. It also cuts down on the so-called
-            "junk" queries. [ Ed note: Text inside square brackets ([]) is
-            additional background information, answers to frequently asked
-            questions, general musings, etc. They will be removed before
-            publication.] [ This document is being collaborated on in Github
-            at: https://github.com/wkumari/draft-wkumari-dnsop-cheese-shop.
-            The most recent version of the document, open issues, etc should
-            all be available here. The authors (gratefully) accept pull
-            requests ]</t>
-          </abstract>
-        </front>
-
-        <seriesInfo name="Internet-Draft"
-                    value="draft-wkumari-dnsop-cheese-shop-01"/>
-
-        <format target="http://www.ietf.org/internet-drafts/draft-wkumari-dnsop-cheese-shop-01.txt"
-                type="TXT"/>
-      </reference>
     </references>
 
-    <section anchor="aggressive-negative-caching-from-rfc-5074"
-             title="Aggressive negative caching from RFC 5074">
-      <t>Imported from Section 6 of <xref target="RFC5074"/>.</t>
-
+    <section anchor="detailed-implementation-idea" title="Detailed implementation idea">
+      <t>
+      <list style="symbols">
       <t>Previously, cached negative responses were indexed by QNAME, QCLASS,
       QTYPE, and the setting of the CD bit (see RFC 4035, Section 4.7), and
       only queries matching the index key would be answered from the cache.
       With aggressive negative caching, the validator, in addition to checking
       to see if the answer is in its cache before sending a query, checks to
       see whether any cached and validated NSEC record denies the existence of
-      the sought record(s).</t>
-
-      <t>Using aggressive negative caching, a validator will not make queries
+      the sought record(s).
+  
+      Using aggressive negative caching, a validator will not make queries
       for any name covered by a cached and validated NSEC record. Furthermore,
       a validator answering queries from clients will synthesize a negative
       answer whenever it has an applicable validated NSEC in its cache unless
-      the CD bit was set on the incoming query.</t>
-
-      <t>Imported from Section 6.1 of <xref target="RFC5074"/>.</t>
-
-      <t>Implementing aggressive negative caching suggests that a validator
-      will need to build an ordered data structure of NSEC records in order to
-      efficiently find covering NSEC records. Only NSEC records from DLV
-      domains need to be included in this data structure.</t>
-    </section>
-
-    <section anchor="detailed-implementation-idea"
-             title="Detailed implementation idea">
-      <t>Section 6.1 of <xref target="RFC5074"/> is expanded as follows.</t>
-
-      <t>Implementing aggressive negative caching suggests that a validator
+      the CD bit was set on the incoming query.
+      (Imported from Section 6 of <xref target="RFC5074"/>). </t>
+ 
+      <t>
+      Implementing aggressive negative caching suggests that a validator
       will need to build an ordered data structure of NSEC and NSEC3 records
       for each signer domain name of NSEC / NSEC3 records in order to
       efficiently find covering NSEC / NSEC3 records. Call the table as
-      NSEC_TABLE.</t>
+      NSEC_TABLE.
+      (Imported from Section 6.1 of <xref target="RFC5074"/> and expanded.)
+      </t>
 
       <t>The aggressive negative caching may be inserted at the cache lookup
       part of the full-service resolvers.</t>
@@ -1002,108 +813,28 @@
       usual" means that the full-resolver resolve the query in Recursive-mode
       as if the full-service resolver does not implement aggressive negative
       caching.</t>
+      </list>
+      </t>
+    </section>
+    <section anchor="random-subdomain-attacks"
+        title="Side effect: mitigation of random subdomain attacks">
+        <t>Random sub-domain attacks (referred to as "Water Torture" attacks
+        or NXDomain attacks) send many queries for non-existent information to
+        full-service resolvers. Their query names consist of random prefixes
+        and a target domain name. The negative cache does not work well, and
+        thus targeted full-service resolvers end up sending queries to
+        authoritative DNS servers of the target domain name.</t>
 
-      <t>To implement aggressive negative caching, resolver algorithm near
-      cache lookup will be changed as follows:</t>
+        <t>The aggressive negative caching is one of possible countermeasures
+	to random subdomain attacks.
+        If the full-service resolver supports aggressive negative caching
+        and the target domain name is signed with NSEC/NSEC3 (without
+        Opt-Out), the aggressive negative caching is one of countermeasures
+	of random subdomain attacks.</t>
 
-      <figure>
-        <artwork><![CDATA[
-QNAME = the query name;
-QTYPE = the query type;
-if ({QNAME,QTYPE} entry exists in the cache) {
-    // the resolver responds the RRSet from the cache
-    resolve the query as usual;
-}
-
-// if NSEC* exists, QTYPE existence is proved by type bitmap
-if (matching NSEC/NSEC3 of QNAME exists in the cache) {
-    if (QTYPE exists in type bitmap of NSEC/NSEC3 of QNAME) {
-        // the entry exists, however, it is not in the cache.
-        // need to iterate QNAME/QTYPE.
-        resolve the query as usual;
-    } else {
-        // QNAME exists, QTYPE does not exist.
-        the resolver can generate NODATA response;
-    }
-}
-
-// Find closest enclosing NS RRset in the cache.
-// The owner of this NS RRset will be a suffix of the QNAME
-//    - the longest suffix of any NS RRset in the cache.
-SIGNER = closest enclosing NS RRSet of QNAME in the cache;
-
-// Check the NS RR of the SIGNER
-if (NS RR of SIGNER and its RRSIG RR do not exist in the cache
-    or SIGNER zone is not signed or not validated) {
-   Resolve the query as usual;
-}
-
-if (SIGNER zone does not have NSEC_TABLE) {
-    Resolve the query as usual;
-}
-
-if (SIGNER zone is signed with NSEC) { // NSEC mode
-
-    // Check the non-existence of QNAME
-    CoveringNSEC = Find the covering NSEC of QNAME from NSEC_TABLE;
-    if (Covering NSEC doesn't exist in the cache and NSEC_TABLE) {
-        Resolve the query as usual.
-    }
-
-    // Select the longest existing name of QNAME from covering NSEC
-    ClosestEncloser = common part of both owner name and
-                        next domain name of CoveringNSEC;
-
-    if (*.LongestExistName entry exists in the cache) {
-        the resolver can generate positive response
-        // synthesize the wildcard *.TEST
-    }
-    if covering NSEC RR of "*.LongestExistName" at SIGNER zone exists
-         in the cache {
-        the resolver can generate negative response;
-    }
-    //*.LongestExistName may exist. cannot generate negative response
-    Resolve the query as usual.
-
-} else
-if (SIGNER zone is signed with NSEC3) {
-    // NSEC3 mode
-
-    ClosestEncloser = Find the closest encloser of QNAME
-                                          from the cache
-    // to prove the non-existence of QNAME,
-    // closest encloser of QNAME must be in the cache
-
-    NextCloserName = the next closer name of QNAME
-    SourceOfSyhthesis = *.ClosestEncloser
-
-    if (matching NSEC3 of ClosestEncloser exists in the cache
-        and
-        covering NSEC3 of NextCloserName exists in the cache
-        and covering NSEC3 is not Opt-Out flag set) {
-
-        // ClosestEncloser exists, and NextCloserName does not exist
-        // then we need to check *.ClosestEncloser
-
-        if (*.ClosestEncloser entry exists in the cache) {
-            if (*.ClosestEncloser/QTYPE entry exists in the cache) {
-                the resolver can generate positive response
-            } else {
-                // lack of *.ClosestEncloser/QTYPE information
-                Resolve the query as usual
-            }
-        } else
-        if (covering NSEC3 of *.ClosestEncloser exists
-            and covering NSEC3 is not Opt-Out flag set) {
-            the resolver can generate negative response;
-        }
-    }
-    // no matching/covering NSEC3 of QNAME information
-    Resolve the query as usual
-}
-]]></artwork>
-      </figure>
-
+        <t>However, attackers can set the CD bit to their attack queries.
+	The CD bit disables signature validation and the aggressive negative
+        caching will be of no use.</t>
       <!--  LocalWords:  NSEC aggressive use
  -->
     </section>
