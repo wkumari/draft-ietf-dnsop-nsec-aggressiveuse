@@ -354,9 +354,9 @@
 
     <section anchor="securitycons" title="Security Considerations">
       <t>Newly registered resource records may not be used immediately.
-      However, choosing suitable TTL value and negative cache TTL value
-      (SOA MINIMUM field) will mitigate the delay concern,
-      and it is not a security problem.</t>
+      However, choosing suitable TTL value and negative cache TTL value (SOA
+      MINIMUM field) will mitigate the delay concern, and it is not a security
+      problem.</t>
 
       <t>It is also suggested to limit the maximum TTL value of NSEC / NSEC3
       resource records in the negative cache to, for example, 10800 seconds
@@ -377,13 +377,10 @@
 
     <section anchor="acknowledgments" title="Acknowledgments">
       <t>The authors gratefully acknowledge DLV <xref target="RFC5074"/>
-      author Samuel Weiler and Unbound developers.
-      Valuable
-      comments were provided by
-      Olafur Gudmundsson, Pieter Lexis,
-      Bob Harold, Tatuya JINMEI, Shumon Huque, Mark
-      Andrews, Casey Deccio, Bob Harold, Stephane Bortzmeyer and Matthijs
-      Mekking.</t>
+      author Samuel Weiler and Unbound developers. Valuable comments were
+      provided by Alexander Dupuy, Olafur Gudmundsson, Pieter Lexis, Bob
+      Harold, Tatuya JINMEI, Shumon Huque, Mark Andrews, Casey Deccio, Bob
+      Harold, Stephane Bortzmeyer and Matthijs Mekking.</t>
     </section>
 
     <section anchor="change-history" title="Change History">
@@ -400,9 +397,10 @@
 
           <t>Cleaned up the TTL section a bit.</t>
 
-	  <t>Removed Effects section, Additional proposal section, and pseudo code.</t>
-	  <t>Moved "mitigaton of random subdomain attacks" to Appendix.</t>
+          <t>Removed Effects section, Additional proposal section, and pseudo
+          code.</t>
 
+          <t>Moved "mitigaton of random subdomain attacks" to Appendix.</t>
         </list></t>
 
       <t>From draft-fujiwara-dnsop-nsec-aggressiveuse-03 -&gt;
@@ -705,7 +703,6 @@
     </references>
 
     <references title="Informative References">
-
       <reference anchor="I-D.vixie-dnsext-resimprove">
         <front>
           <title>Improvements to DNS Resolvers for Resiliency, Robustness, and
@@ -775,66 +772,62 @@
         <format target="http://www.ietf.org/internet-drafts/draft-ietf-dnsop-nxdomain-cut-03.txt"
                 type="TXT"/>
       </reference>
-
     </references>
 
-    <section anchor="detailed-implementation-idea" title="Detailed implementation idea">
-      <t>
-      <list style="symbols">
-      <t>Previously, cached negative responses were indexed by QNAME, QCLASS,
-      QTYPE, and the setting of the CD bit (see RFC 4035, Section 4.7), and
-      only queries matching the index key would be answered from the cache.
-      With aggressive negative caching, the validator, in addition to checking
-      to see if the answer is in its cache before sending a query, checks to
-      see whether any cached and validated NSEC record denies the existence of
-      the sought record(s).
-  
-      Using aggressive negative caching, a validator will not make queries
-      for any name covered by a cached and validated NSEC record. Furthermore,
-      a validator answering queries from clients will synthesize a negative
-      answer whenever it has an applicable validated NSEC in its cache unless
-      the CD bit was set on the incoming query.
-      (Imported from Section 6 of <xref target="RFC5074"/>). </t>
- 
-      <t>
-      Implementing aggressive negative caching suggests that a validator
-      will need to build an ordered data structure of NSEC and NSEC3 records
-      for each signer domain name of NSEC / NSEC3 records in order to
-      efficiently find covering NSEC / NSEC3 records. Call the table as
-      NSEC_TABLE.
-      (Imported from Section 6.1 of <xref target="RFC5074"/> and expanded.)
-      </t>
+    <section anchor="detailed-implementation-idea"
+             title="Detailed implementation idea">
+      <t><list style="symbols">
+          <t>Previously, cached negative responses were indexed by QNAME,
+          QCLASS, QTYPE, and the setting of the CD bit (see RFC 4035, Section
+          4.7), and only queries matching the index key would be answered from
+          the cache. With aggressive negative caching, the validator, in
+          addition to checking to see if the answer is in its cache before
+          sending a query, checks to see whether any cached and validated NSEC
+          record denies the existence of the sought record(s). Using
+          aggressive negative caching, a validator will not make queries for
+          any name covered by a cached and validated NSEC record. Furthermore,
+          a validator answering queries from clients will synthesize a
+          negative answer whenever it has an applicable validated NSEC in its
+          cache unless the CD bit was set on the incoming query. (Imported
+          from Section 6 of <xref target="RFC5074"/>).</t>
 
-      <t>The aggressive negative caching may be inserted at the cache lookup
-      part of the full-service resolvers.</t>
+          <t>Implementing aggressive negative caching suggests that a
+          validator will need to build an ordered data structure of NSEC and
+          NSEC3 records for each signer domain name of NSEC / NSEC3 records in
+          order to efficiently find covering NSEC / NSEC3 records. Call the
+          table as NSEC_TABLE. (Imported from Section 6.1 of <xref
+          target="RFC5074"/> and expanded.)</t>
 
-      <t>If errors happen in aggressive negative caching algorithm, resolvers
-      MUST fall back to resolve the query as usual. "Resolve the query as
-      usual" means that the full-resolver resolve the query in Recursive-mode
-      as if the full-service resolver does not implement aggressive negative
-      caching.</t>
-      </list>
-      </t>
+          <t>The aggressive negative caching may be inserted at the cache
+          lookup part of the full-service resolvers.</t>
+
+          <t>If errors happen in aggressive negative caching algorithm,
+          resolvers MUST fall back to resolve the query as usual. "Resolve the
+          query as usual" means that the full-resolver resolve the query in
+          Recursive-mode as if the full-service resolver does not implement
+          aggressive negative caching.</t>
+        </list></t>
     </section>
+
     <section anchor="random-subdomain-attacks"
-        title="Side effect: mitigation of random subdomain attacks">
-        <t>Random sub-domain attacks (referred to as "Water Torture" attacks
-        or NXDomain attacks) send many queries for non-existent information to
-        full-service resolvers. Their query names consist of random prefixes
-        and a target domain name. The negative cache does not work well, and
-        thus targeted full-service resolvers end up sending queries to
-        authoritative DNS servers of the target domain name.</t>
+             title="Side effect: mitigation of random subdomain attacks">
+      <t>Random sub-domain attacks (referred to as "Water Torture" attacks or
+      NXDomain attacks) send many queries for non-existent information to
+      full-service resolvers. Their query names consist of random prefixes and
+      a target domain name. The negative cache does not work well, and thus
+      targeted full-service resolvers end up sending queries to authoritative
+      DNS servers of the target domain name.</t>
 
-        <t>The aggressive negative caching is one of possible countermeasures
-	to random subdomain attacks.
-        If the full-service resolver supports aggressive negative caching
-        and the target domain name is signed with NSEC/NSEC3 (without
-        Opt-Out), the aggressive negative caching is one of countermeasures
-	of random subdomain attacks.</t>
+      <t>The aggressive negative caching is one of possible countermeasures to
+      random subdomain attacks. If the full-service resolver supports
+      aggressive negative caching and the target domain name is signed with
+      NSEC/NSEC3 (without Opt-Out), the aggressive negative caching is one of
+      countermeasures of random subdomain attacks.</t>
 
-        <t>However, attackers can set the CD bit to their attack queries.
-	The CD bit disables signature validation and the aggressive negative
-        caching will be of no use.</t>
+      <t>However, attackers can set the CD bit to their attack queries. The CD
+      bit disables signature validation and the aggressive negative caching
+      will be of no use.</t>
+
       <!--  LocalWords:  NSEC aggressive use
  -->
     </section>
