@@ -378,9 +378,9 @@
     <section anchor="acknowledgments" title="Acknowledgments">
       <t>The authors gratefully acknowledge DLV <xref target="RFC5074"/>
       author Samuel Weiler and Unbound developers. Valuable comments were
-      provided by Alexander Dupuy, Olafur Gudmundsson, Pieter Lexis, Bob
-      Harold, Tatuya JINMEI, Shumon Huque, Mark Andrews, Casey Deccio, Bob
-      Harold, Stephane Bortzmeyer and Matthijs Mekking.</t>
+      provided by Mark Andrews, Stephane Bortzmeyer, Casey Deccio, Alexander
+      Dupuy, Olafur Gudmundsson, Bob Harold, Shumon Huque, Tatuya JINMEI,
+      Pieter Lexis and Matthijs Mekking.</t>
     </section>
 
     <section anchor="change-history" title="Change History">
