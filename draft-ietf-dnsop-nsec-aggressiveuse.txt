@@ -6,13 +6,13 @@ Network Working Group                                        K. Fujiwara
 Internet-Draft                                                      JPRS
 Updates: 4035 (if approved)                                      A. Kato
 Intended status: Standards Track                               Keio/WIDE
-Expires: February 3, 2017                                      W. Kumari
+Expires: March 17, 2017                                        W. Kumari
                                                                   Google
-                                                         August 02, 2016
+                                                      September 13, 2016
 
 
                       Aggressive use of NSEC/NSEC3
-                 draft-ietf-dnsop-nsec-aggressiveuse-01
+                 draft-ietf-dnsop-nsec-aggressiveuse-02
 
 Abstract
 
@@ -53,9 +53,9 @@ Status of This Memo
 
 
 
-Fujiwara, et al.        Expires February 3, 2017                [Page 1]
+Fujiwara, et al.         Expires March 17, 2017                 [Page 1]
 
-Internet-Draft              NSEC/NSEC3 usage                 August 2016
+Internet-Draft              NSEC/NSEC3 usage              September 2016
 
 
    Internet-Drafts are working documents of the Internet Engineering
@@ -68,7 +68,7 @@ Internet-Draft              NSEC/NSEC3 usage                 August 2016
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on February 3, 2017.
+   This Internet-Draft will expire on March 17, 2017.
 
 Copyright Notice
 
@@ -99,19 +99,19 @@ Table of Contents
      5.5.  Consideration on TTL  . . . . . . . . . . . . . . . . . .   7
    6.  Benefits  . . . . . . . . . . . . . . . . . . . . . . . . . .   7
    7.  Update to RFC 4035  . . . . . . . . . . . . . . . . . . . . .   8
-   8.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   8
-   9.  Security Considerations . . . . . . . . . . . . . . . . . . .   8
+   8.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   9
+   9.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
    10. Implementation Status . . . . . . . . . . . . . . . . . . . .   9
    11. Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .   9
    12. Change History  . . . . . . . . . . . . . . . . . . . . . . .   9
-     12.1.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-01 . . .  10
-     12.2.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-02 . . .  10
+     12.1.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-01 . . .  11
+     12.2.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-02 . . .  11
 
 
 
-Fujiwara, et al.        Expires February 3, 2017                [Page 2]
+Fujiwara, et al.         Expires March 17, 2017                 [Page 2]
 
-Internet-Draft              NSEC/NSEC3 usage                 August 2016
+Internet-Draft              NSEC/NSEC3 usage              September 2016
 
 
      12.3.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-03 . . .  11
@@ -151,7 +151,9 @@ Internet-Draft              NSEC/NSEC3 usage                 August 2016
    document are to be interpreted as described in RFC 2119 [RFC2119].
 
    Many of the specialized terms used in this document are defined in
-   DNS Terminology [RFC7719].
+   DNS Terminology [RFC7719].  In this document we are using the terms
+   "recursive resolver" or "recursive server" as a more readable
+   alternative to the more formal[RFC7719] "full-service resolver"
 
    The key words "Closest Encloser" and "Source of Synthesis" in this
    document are to be interpreted as described in[RFC4592].
@@ -163,11 +165,9 @@ Internet-Draft              NSEC/NSEC3 usage                 August 2016
 
 
 
-
-
-Fujiwara, et al.        Expires February 3, 2017                [Page 3]
+Fujiwara, et al.         Expires March 17, 2017                 [Page 3]
 
-Internet-Draft              NSEC/NSEC3 usage                 August 2016
+Internet-Draft              NSEC/NSEC3 usage              September 2016
 
 
 3.  Problem Statement
@@ -221,9 +221,9 @@ Internet-Draft              NSEC/NSEC3 usage                 August 2016
 
 
 
-Fujiwara, et al.        Expires February 3, 2017                [Page 4]
+Fujiwara, et al.         Expires March 17, 2017                 [Page 4]
 
-Internet-Draft              NSEC/NSEC3 usage                 August 2016
+Internet-Draft              NSEC/NSEC3 usage              September 2016
 
 
    [RFC4035]; Section 4.5 states:
@@ -277,9 +277,9 @@ Internet-Draft              NSEC/NSEC3 usage                 August 2016
 
 
 
-Fujiwara, et al.        Expires February 3, 2017                [Page 5]
+Fujiwara, et al.         Expires March 17, 2017                 [Page 5]
 
-Internet-Draft              NSEC/NSEC3 usage                 August 2016
+Internet-Draft              NSEC/NSEC3 usage              September 2016
 
 
 5.2.  NSEC
@@ -333,9 +333,9 @@ Internet-Draft              NSEC/NSEC3 usage                 August 2016
 
 
 
-Fujiwara, et al.        Expires February 3, 2017                [Page 6]
+Fujiwara, et al.         Expires March 17, 2017                 [Page 6]
 
-Internet-Draft              NSEC/NSEC3 usage                 August 2016
+Internet-Draft              NSEC/NSEC3 usage              September 2016
 
 
    Such aggressive use of cached deduced wildcard can be employed
@@ -378,37 +378,52 @@ Internet-Draft              NSEC/NSEC3 usage                 August 2016
       answer (negative) queries without asking the authoritative server,
       the authoritative servers receive less queries.  This decreases
       the authoritative server bandwidth, queries per second and CPU
-      utilisation.
+      utilization.
 
    The scale of the benefit depends upon multiple factors, including the
    query distribution.  For example, currently around 65% of queries to
-   the DNS root result in NXDOMAIN responses; this technique will
+   Root Name servers result in NXDOMAIN responses; this technique will
    eliminate a sizable quantity of these.
 
 
 
 
 
-Fujiwara, et al.        Expires February 3, 2017                [Page 7]
+Fujiwara, et al.         Expires March 17, 2017                 [Page 7]
 
-Internet-Draft              NSEC/NSEC3 usage                 August 2016
+Internet-Draft              NSEC/NSEC3 usage              September 2016
 
+
+   [ Editor note: There has been some discussion on if this document
+   should discuss this attack and mitigation.  The authors think that
+   this is useful / important, but some participants feel that it
+   oversells the DoS mitigation benefit.  Please let us know if the
+   below is helpful.  Also, the below description is not as clear as it
+   could be - it's been tricky to balance readability, correctness and
+   conciseness.  Text gratefully accepted... ]
 
    The technique described in this document may also mitigate so-called
-   "random QNAME attacks".  The effectiveness of this depends upon a
-   number of factors, including if the attacker is making his queries
-   through recursive resolvers (e.g to hide his source), the number of
-   entries in the zone, the TTL, if the zone is using NSEC, etc.  In the
-   ideal case, authoritative servers under attack will need to answer
-   between (number of entries in the zone) and 2 * (number of entries in
-   the zone) queries from each recursive server being used in the
-   attack.  This is because there are as many "holes" between labels as
-   there are labels in a zone.  If the random query falls in range for
-   which recursive server does not have an NSEC record cached, it will
-   send a query to the authoritative server, and so it will send
-   approximately the same number of queries as there are "holes" between
-   entries.  If the random queries happen to be for names which exist in
-   the zone, the recursive will send those as well.
+   "random QNAME attacks", in which attackers send many queries for
+   random sub-domains to recursive resolvers.  As the recursive server
+   will not have the answers cached it has to ask the authoritative
+   servers for each random query, leading to a DoS on the authoritative
+   (and often recursive) servers.  Aggressive NSEC may help mitigate
+   these attacks by allowing the recursive to answer directly from cache
+   for any random queries which fall within already requested ranges.
+   The effectiveness of this depends upon a number of factors, including
+   if the attacker is making his queries through recursive resolvers
+   (e.g to hide his source), the number of entries in the zone, the TTL,
+   if the zone is using NSEC, if the attacker is setting the CD bit,
+   etc.  In the ideal case, authoritative servers under attack will need
+   to answer somewhere between number_of_entries_in_zone queries and 2 *
+   number_of_entries_in_zone queries from each recursive server.  This
+   is because there are as many "holes" between labels as there are
+   labels in a zone.  If the random query falls in range for which
+   recursive server does not have an NSEC record cached, it will send a
+   query to the authoritative server, and so it will send approximately
+   the same number of queries as there are "holes" between entries.  If
+   the random queries happen to be for names which exist in the zone,
+   the recursive will send those as well.
 
 7.  Update to RFC 4035
 
@@ -421,6 +436,19 @@ Internet-Draft              NSEC/NSEC3 usage                 August 2016
    view of the namespace".
 
    The paragraph is updated as follows:
+
+
+
+
+
+
+
+
+
+Fujiwara, et al.         Expires March 17, 2017                 [Page 8]
+
+Internet-Draft              NSEC/NSEC3 usage              September 2016
+
 
    +--------------------------------------------------------------+
    |  Once the records are validated, DNSSEC enabled recursive    |
@@ -442,14 +470,6 @@ Internet-Draft              NSEC/NSEC3 usage                 August 2016
 
    It is also suggested to limit the maximum TTL value of NSEC / NSEC3
    resource records in the negative cache to, for example, 10800 seconds
-
-
-
-Fujiwara, et al.        Expires February 3, 2017                [Page 8]
-
-Internet-Draft              NSEC/NSEC3 usage                 August 2016
-
-
    (3hrs), to mitigate this issue.  Implementations which comply with
    this proposal are recommended to have a configurable maximum value of
    NSEC RRs in the negative cache.
@@ -478,6 +498,14 @@ Internet-Draft              NSEC/NSEC3 usage                 August 2016
 
    -01 to -02:
 
+
+
+
+Fujiwara, et al.         Expires March 17, 2017                 [Page 9]
+
+Internet-Draft              NSEC/NSEC3 usage              September 2016
+
+
    o  Added Section 6 - Benefits (as suggested by Jinmei).
 
    o  Removed Appendix B (Jinmei)
@@ -486,6 +514,12 @@ Internet-Draft              NSEC/NSEC3 usage                 August 2016
 
    o  Integrated other comments from Jinmei from https://www.ietf.org/
       mail-archive/web/dnsop/current/msg17875.html
+
+   o  Integrated comment from co-authors, including re-adding parts of
+      Appendix B, terminology, typos.
+
+   o  Tried to explain under what conditions this may actually mitigate
+      attacks.
 
    -00 to -01:
 
@@ -499,17 +533,10 @@ Internet-Draft              NSEC/NSEC3 usage                 August 2016
 
    o  Cleaned up the TTL section a bit.
 
-
-
-Fujiwara, et al.        Expires February 3, 2017                [Page 9]
-
-Internet-Draft              NSEC/NSEC3 usage                 August 2016
-
-
    o  Removed Effects section, Additional proposal section, and pseudo
       code.
 
-   o  Moved "mitigaton of random subdomain attacks" to Appendix.
+   o  Moved "mitigation of random subdomain attacks" to Appendix.
 
    From draft-fujiwara-dnsop-nsec-aggressiveuse-03 -> draft-ietf-dnsop-
    nsec-aggressiveuse
@@ -527,6 +554,13 @@ Internet-Draft              NSEC/NSEC3 usage                 August 2016
    o  Simplified pseudo code for NSEC3
 
    o  Added Warren as co-author.
+
+
+
+Fujiwara, et al.         Expires March 17, 2017                [Page 10]
+
+Internet-Draft              NSEC/NSEC3 usage              September 2016
+
 
    o  Reworded much of the problem statement
 
@@ -550,17 +584,6 @@ Internet-Draft              NSEC/NSEC3 usage                 August 2016
 
    o  Moved Aggressive Negative Caching Flag idea into Additional
       Proposals
-
-
-
-
-
-
-
-Fujiwara, et al.        Expires February 3, 2017               [Page 10]
-
-Internet-Draft              NSEC/NSEC3 usage                 August 2016
-
 
 12.3.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-03
 
@@ -587,6 +610,14 @@ Internet-Draft              NSEC/NSEC3 usage                 August 2016
               NCACHE)", RFC 2308, DOI 10.17487/RFC2308, March 1998,
               <http://www.rfc-editor.org/info/rfc2308>.
 
+
+
+
+Fujiwara, et al.         Expires March 17, 2017                [Page 11]
+
+Internet-Draft              NSEC/NSEC3 usage              September 2016
+
+
    [RFC4035]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
               Rose, "Protocol Modifications for the DNS Security
               Extensions", RFC 4035, DOI 10.17487/RFC4035, March 2005,
@@ -608,15 +639,6 @@ Internet-Draft              NSEC/NSEC3 usage                 August 2016
    [RFC7719]  Hoffman, P., Sullivan, A., and K. Fujiwara, "DNS
               Terminology", RFC 7719, DOI 10.17487/RFC7719, December
               2015, <http://www.rfc-editor.org/info/rfc7719>.
-
-
-
-
-
-Fujiwara, et al.        Expires February 3, 2017               [Page 11]
-
-Internet-Draft              NSEC/NSEC3 usage                 August 2016
-
 
 13.2.  Informative References
 
@@ -644,6 +666,14 @@ Appendix A.  Detailed implementation notes
       not make queries for any name covered by a cached and validated
       NSEC record.  Furthermore, a validator answering queries from
       clients will synthesize a negative answer whenever it has an
+
+
+
+Fujiwara, et al.         Expires March 17, 2017                [Page 12]
+
+Internet-Draft              NSEC/NSEC3 usage              September 2016
+
+
       applicable validated NSEC in its cache unless the CD bit was set
       on the incoming query.  (Imported from Section 6 of [RFC5074]).
 
@@ -661,18 +691,6 @@ Appendix A.  Detailed implementation notes
       resolvers MUST fall back to resolve the query as usual.  "Resolve
       the query as usual" means that the resolver must process the query
       as though it does not implement aggressive negative caching.
-
-
-
-
-
-
-
-
-Fujiwara, et al.        Expires February 3, 2017               [Page 12]
-
-Internet-Draft              NSEC/NSEC3 usage                 August 2016
-
 
 Authors' Addresses
 
@@ -707,22 +725,4 @@ Authors' Addresses
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Fujiwara, et al.        Expires February 3, 2017               [Page 13]
+Fujiwara, et al.         Expires March 17, 2017                [Page 13]
