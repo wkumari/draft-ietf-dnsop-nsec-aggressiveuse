@@ -146,7 +146,7 @@
       resolver"</t>
 
       <t>The key words "Closest Encloser" and "Source of Synthesis" in this
-      document are to be interpreted as described in<xref
+      document are to be interpreted as described in <xref
       target="RFC4592"/>.</t>
 
       <t>"Closest Encloser" is also defined in NSEC3 <xref target="RFC5155"/>,

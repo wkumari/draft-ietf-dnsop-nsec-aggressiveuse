@@ -154,7 +154,7 @@ Internet-Draft              NSEC/NSEC3 usage              September 2016
    alternative to the more formal[RFC7719] "full-service resolver"
 
    The key words "Closest Encloser" and "Source of Synthesis" in this
-   document are to be interpreted as described in[RFC4592].
+   document are to be interpreted as described in [RFC4592].
 
    "Closest Encloser" is also defined in NSEC3 [RFC5155], as is "Next
    closer name".
