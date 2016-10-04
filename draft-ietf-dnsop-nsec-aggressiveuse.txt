@@ -122,12 +122,11 @@ Internet-Draft              NSEC/NSEC3 usage              September 2016
 
 1.  Introduction
 
-   A DNS negative cache currently exists, and is used to cache the fact
-   that a name does not exist.  This method of negative caching requires
-   exact matching; this leads to unnecessary additional lookups,
-   increases latency, leads to extra resource utilization on both
-   authoritative and recursive servers, and decreases privacy by leaking
-   queries.
+   A DNS negative cache exists, and is used to cache the fact that a
+   name does not exist.  This method of negative caching requires exact
+   matching; this leads to unnecessary additional lookups, increases
+   latency, leads to extra resource utilization on both authoritative
+   and recursive servers, and decreases privacy by leaking queries.
 
    This document updates RFC 4035 to allow recursive resolvers to use
    NSEC/NSEC3 resource records to aggressively cache negative answers.
@@ -165,6 +164,7 @@ Internet-Draft              NSEC/NSEC3 usage              September 2016
 
 
 
+
 Fujiwara, et al.         Expires March 17, 2017                 [Page 3]
 
 Internet-Draft              NSEC/NSEC3 usage              September 2016
@@ -172,8 +172,8 @@ Internet-Draft              NSEC/NSEC3 usage              September 2016
 
 3.  Problem Statement
 
-   The current DNS negative cache caches negative (non-existent)
-   information, and requires an exact match in most instances [RFC2308].
+   The DNS negative cache caches negative (non-existent) information,
+   and requires an exact match in most instances [RFC2308].
 
    Assume that the (DNSSEC signed) "example.com" zone contains:
 
@@ -187,12 +187,12 @@ Internet-Draft              NSEC/NSEC3 usage              September 2016
    query the example.com authoritative servers and will get back an NSEC
    (or NSEC3) record starting that there are no records between apple
    and elephant.  The recursive resolver then knows that cat.example.com
-   does not exist; however, it (currently) does not use the fact that
-   the proof covers a range (apple to elephant) to suppress queries for
-   other labels that fall within this range.  This means that if the
-   recursive resolvers gets a query for ball.example.com (or
-   dog.example.com) it will once again go off and query the example.com
-   servers for these names.
+   does not exist; however, it does not use the fact that the proof
+   covers a range (apple to elephant) to suppress queries for other
+   labels that fall within this range.  This means that if the recursive
+   resolvers gets a query for ball.example.com (or dog.example.com) it
+   will once again go off and query the example.com servers for these
+   names.
 
    Apart from wasting bandwidth, this also wastes resources on the
    recursive server (it needs to keep state for outstanding queries),

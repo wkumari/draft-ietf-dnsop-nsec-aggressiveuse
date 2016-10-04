@@ -111,7 +111,7 @@
 
   <middle>
     <section anchor="introduction" title="Introduction">
-      <t>A DNS negative cache currently exists, and is used to cache the fact
+      <t>A DNS negative cache exists, and is used to cache the fact
       that a name does not exist. This method of negative caching requires
       exact matching; this leads to unnecessary additional lookups, increases
       latency, leads to extra resource utilization on both authoritative and
@@ -154,7 +154,7 @@
     </section>
 
     <section anchor="problem-statement" title="Problem Statement">
-      <t>The current DNS negative cache caches negative (non-existent)
+      <t>The DNS negative cache caches negative (non-existent)
       information, and requires an exact match in most instances <xref
       target="RFC2308"/>.</t>
 
@@ -172,7 +172,7 @@
       query the example.com authoritative servers and will get back an NSEC
       (or NSEC3) record starting that there are no records between apple and
       elephant. The recursive resolver then knows that cat.example.com does
-      not exist; however, it (currently) does not use the fact that the proof
+      not exist; however, it does not use the fact that the proof
       covers a range (apple to elephant) to suppress queries for other labels
       that fall within this range. This means that if the recursive resolvers
       gets a query for ball.example.com (or dog.example.com) it will once
