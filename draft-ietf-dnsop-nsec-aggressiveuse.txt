@@ -129,10 +129,10 @@ Internet-Draft              NSEC/NSEC3 usage              September 2016
    and recursive servers, and decreases privacy by leaking queries.
 
    This document updates RFC 4035 to allow recursive resolvers to use
-   NSEC/NSEC3 resource records to aggressively cache negative answers.
-   This would allow such resolvers to respond with NXDOMAIN immediately
-   if the name in question falls into a range expressed by a NSEC/NSEC3
-   resource record already in the cache.
+   NSEC/NSEC3 resource records to aggressively use cache negative
+   answers.  This would allow such resolvers to respond with NXDOMAIN
+   immediately if the name in question falls into a range expressed by a
+   NSEC/NSEC3 resource record already in the cache.
 
    Aggressive Negative Caching was first proposed in Section 6 of DNSSEC
    Lookaside Validation (DLV) [RFC5074] in order to find covering NSEC
