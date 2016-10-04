@@ -93,12 +93,11 @@ Table of Contents
    2.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   3
    3.  Problem Statement . . . . . . . . . . . . . . . . . . . . . .   4
    4.  Background  . . . . . . . . . . . . . . . . . . . . . . . . .   4
-   5.  Proposed Solution . . . . . . . . . . . . . . . . . . . . . .   5
-     5.1.  Aggressive Negative Caching . . . . . . . . . . . . . . .   5
-     5.2.  NSEC  . . . . . . . . . . . . . . . . . . . . . . . . . .   6
-     5.3.  NSEC3 . . . . . . . . . . . . . . . . . . . . . . . . . .   6
-     5.4.  Wildcard  . . . . . . . . . . . . . . . . . . . . . . . .   6
-     5.5.  Consideration on TTL  . . . . . . . . . . . . . . . . . .   7
+   5.  Aggressive Negative Caching . . . . . . . . . . . . . . . . .   5
+     5.1.  NSEC  . . . . . . . . . . . . . . . . . . . . . . . . . .   6
+     5.2.  NSEC3 . . . . . . . . . . . . . . . . . . . . . . . . . .   6
+     5.3.  Wildcard  . . . . . . . . . . . . . . . . . . . . . . . .   6
+     5.4.  Consideration on TTL  . . . . . . . . . . . . . . . . . .   7
    6.  Benefits  . . . . . . . . . . . . . . . . . . . . . . . . . .   7
    7.  Update to RFC 4035  . . . . . . . . . . . . . . . . . . . . .   8
    8.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   9
@@ -108,6 +107,7 @@ Table of Contents
    12. Change History  . . . . . . . . . . . . . . . . . . . . . . .   9
      12.1.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-01 . . .  11
      12.2.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-02 . . .  11
+     12.3.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-03 . . .  11
 
 
 
@@ -116,7 +116,6 @@ Fujiwara, et al.         Expires March 17, 2017                 [Page 2]
 Internet-Draft              NSEC/NSEC3 usage              September 2016
 
 
-     12.3.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-03 . . .  11
    13. References  . . . . . . . . . . . . . . . . . . . . . . . . .  11
      13.1.  Normative References . . . . . . . . . . . . . . . . . .  11
      13.2.  Informative References . . . . . . . . . . . . . . . . .  12
@@ -162,6 +161,7 @@ Internet-Draft              NSEC/NSEC3 usage              September 2016
 
    "Closest Encloser" is also defined in NSEC3 [RFC5155], as is "Next
    closer name".
+
 
 
 
@@ -245,9 +245,7 @@ Internet-Draft              NSEC/NSEC3 usage              September 2016
    authoritative statement of how quickly a name can start working
    within a zone.
 
-5.  Proposed Solution
-
-5.1.  Aggressive Negative Caching
+5.  Aggressive Negative Caching
 
    Section 4.5 of [RFC4035] shows that "In theory, a resolver could use
    wildcards or NSEC RRs to generate positive and negative responses
@@ -279,12 +277,14 @@ Internet-Draft              NSEC/NSEC3 usage              September 2016
 
 
 
+
+
 Fujiwara, et al.         Expires March 17, 2017                 [Page 5]
 
 Internet-Draft              NSEC/NSEC3 usage              September 2016
 
 
-5.2.  NSEC
+5.1.  NSEC
 
    Implementations SHOULD enable aggressive use of NSEC by default.
    Implementations SHOULD provide a configuration switch to disable
@@ -299,7 +299,7 @@ Internet-Draft              NSEC/NSEC3 usage              September 2016
    source of synthesis and the covering NSEC RR of the query name, the
    resolver may respond with NXDOMAIN error immediately.
 
-5.3.  NSEC3
+5.2.  NSEC3
 
    NSEC3 aggressive negative caching is more difficult.  If the zone is
    signed with NSEC3, the validating resolver needs to check the
@@ -320,7 +320,7 @@ Internet-Draft              NSEC/NSEC3 usage              September 2016
    configuration switch to disable aggressive use of NSEC3 and allow it
    to be enabled or disabled for specific zones.
 
-5.4.  Wildcard
+5.3.  Wildcard
 
    The last paragraph of RFC 4035 Section 4.5 discusses aggressive use
    of a cached deduced wildcard (as well as aggressive use of NSEC) and
@@ -352,7 +352,7 @@ Internet-Draft              NSEC/NSEC3 usage              September 2016
    provide a configuration switch to disable aggressive use of
    wildcards.
 
-5.5.  Consideration on TTL
+5.4.  Consideration on TTL
 
    The TTL value of negative information is especially important,
    because newly added domain names cannot be used while the negative
@@ -604,8 +604,8 @@ Internet-Draft              NSEC/NSEC3 usage              September 2016
 13.1.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
-              Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/
-              RFC2119, March 1997,
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
               <http://www.rfc-editor.org/info/rfc2119>.
 
    [RFC2308]  Andrews, M., "Negative Caching of DNS Queries (DNS

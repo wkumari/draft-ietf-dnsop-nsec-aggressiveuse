@@ -221,9 +221,8 @@
       working within a zone.</t>
     </section>
 
-    <section anchor="proposed-solution" title="Proposed Solution">
-      <section anchor="aggressive-negative-caching"
-               title="Aggressive Negative Caching">
+    <section anchor="aggressive-negative-caching"
+             title="Aggressive Negative Caching">
         <t/>
 
         <t>Section 4.5 of <xref target="RFC4035"/> shows that "In theory, a
@@ -255,7 +254,6 @@
         <t>If the query name has the matching NSEC/NSEC3 RR proving the
         information requested does not exist, the resolver may respond with a
         NODATA (empty) answer.</t>
-      </section>
 
       <section anchor="nsec" title="NSEC">
         <t>Implementations SHOULD enable aggressive use of NSEC by default.
