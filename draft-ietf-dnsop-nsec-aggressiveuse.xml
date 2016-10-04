@@ -6,7 +6,7 @@
 <?rfc tocdepth="4"?>
 <?rfc sortrefs="yes"?>
 <?rfc symrefs="yes"?>
-<rfc category="std" docName="draft-ietf-dnsop-nsec-aggressiveuse-02"
+<rfc category="std" docName="draft-ietf-dnsop-nsec-aggressiveuse-03"
      ipr="trust200902" updates="4035">
   <front>
     <title abbrev="NSEC/NSEC3 usage">Aggressive use of NSEC/NSEC3</title>
@@ -73,7 +73,7 @@
       </address>
     </author>
 
-    <date day="13" month="September" year="2016"/>
+    <date day="4" month="October" year="2016"/>
 
     <area>operations</area>
 
@@ -111,17 +111,17 @@
 
   <middle>
     <section anchor="introduction" title="Introduction">
-      <t>A DNS negative cache exists, and is used to cache the fact
-      that a name does not exist. This method of negative caching requires
-      exact matching; this leads to unnecessary additional lookups, increases
+      <t>A DNS negative cache exists, and is used to cache the fact that a
+      name does not exist. This method of negative caching requires exact
+      matching; this leads to unnecessary additional lookups, increases
       latency, leads to extra resource utilization on both authoritative and
       recursive servers, and decreases privacy by leaking queries.</t>
 
       <t>This document updates RFC 4035 to allow recursive resolvers to use
-      NSEC/NSEC3 resource records to aggressively use cache negative answers. This
-      would allow such resolvers to respond with NXDOMAIN immediately if the
-      name in question falls into a range expressed by a NSEC/NSEC3 resource
-      record already in the cache.</t>
+      NSEC/NSEC3 resource records to aggressively use cached negative answers.
+      This would allow such resolvers to respond with NXDOMAIN immediately if
+      the name in question falls into a range expressed by a NSEC/NSEC3
+      resource record already in the cache.</t>
 
       <t>Aggressive Negative Caching was first proposed in Section 6 of DNSSEC
       Lookaside Validation (DLV) <xref target="RFC5074"/> in order to find
@@ -154,8 +154,8 @@
     </section>
 
     <section anchor="problem-statement" title="Problem Statement">
-      <t>The DNS negative cache caches negative (non-existent)
-      information, and requires an exact match in most instances <xref
+      <t>The DNS negative cache caches negative (non-existent) information,
+      and requires an exact match in most instances <xref
       target="RFC2308"/>.</t>
 
       <t>Assume that the (DNSSEC signed) "example.com" zone contains:</t>
@@ -172,11 +172,11 @@
       query the example.com authoritative servers and will get back an NSEC
       (or NSEC3) record starting that there are no records between apple and
       elephant. The recursive resolver then knows that cat.example.com does
-      not exist; however, it does not use the fact that the proof
-      covers a range (apple to elephant) to suppress queries for other labels
-      that fall within this range. This means that if the recursive resolvers
-      gets a query for ball.example.com (or dog.example.com) it will once
-      again go off and query the example.com servers for these names.</t>
+      not exist; however, it does not use the fact that the proof covers a
+      range (apple to elephant) to suppress queries for other labels that fall
+      within this range. This means that if the recursive resolvers gets a
+      query for ball.example.com (or dog.example.com) it will once again go
+      off and query the example.com servers for these names.</t>
 
       <t>Apart from wasting bandwidth, this also wastes resources on the
       recursive server (it needs to keep state for outstanding queries),
@@ -223,20 +223,20 @@
 
     <section anchor="aggressive-negative-caching"
              title="Aggressive Negative Caching">
-        <t/>
+      <t/>
 
-        <t>Section 4.5 of <xref target="RFC4035"/> shows that "In theory, a
-        resolver could use wildcards or NSEC RRs to generate positive and
-        negative responses (respectively) until the TTL or signatures on the
-        records in question expire. However, it seems prudent for resolvers to
-        avoid blocking new authoritative data or synthesizing new data on
-        their own. Resolvers that follow this recommendation will have a more
-        consistent view of the namespace".</t>
+      <t>Section 4.5 of <xref target="RFC4035"/> shows that "In theory, a
+      resolver could use wildcards or NSEC RRs to generate positive and
+      negative responses (respectively) until the TTL or signatures on the
+      records in question expire. However, it seems prudent for resolvers to
+      avoid blocking new authoritative data or synthesizing new data on their
+      own. Resolvers that follow this recommendation will have a more
+      consistent view of the namespace".</t>
 
-        <t>This document relaxes this this restriction, as follows:</t>
+      <t>This document relaxes this this restriction, as follows:</t>
 
-        <figure>
-          <artwork><![CDATA[
+      <figure>
+        <artwork><![CDATA[
 +--------------------------------------------------------------+
 |  Once the records are validated, DNSSEC enabled validating   |
 |  resolvers MAY use NSEC/NSEC3 resource records to generate   |
@@ -244,16 +244,16 @@
 |  for those records expire.                                   |
 +--------------------------------------------------------------+
 ]]></artwork>
-        </figure>
+      </figure>
 
-        <t>If the validating resolver's cache has sufficient information to
-        validate the query, the resolver SHOULD use NSEC/NSEC3/wildcard
-        records aggressively. Otherwise, it MUST fall back to send the query
-        to the authoritative DNS servers.</t>
+      <t>If the validating resolver's cache has sufficient information to
+      validate the query, the resolver SHOULD use NSEC/NSEC3/wildcard records
+      aggressively. Otherwise, it MUST fall back to send the query to the
+      authoritative DNS servers.</t>
 
-        <t>If the query name has the matching NSEC/NSEC3 RR proving the
-        information requested does not exist, the resolver may respond with a
-        NODATA (empty) answer.</t>
+      <t>If the query name has the matching NSEC/NSEC3 RR proving the
+      information requested does not exist, the resolver may respond with a
+      NODATA (empty) answer.</t>
 
       <section anchor="nsec" title="NSEC">
         <t>Implementations SHOULD enable aggressive use of NSEC by default.
@@ -303,10 +303,9 @@
         justified for performance and other benefits.</t>
 
         <t>Such aggressive use of cached deduced wildcard can be employed
-        independently from aggressive use of NSEC. But, it will be more
-        effective when both are enabled since the resolver can determine the
-        name subject to wildcard would not otherwise exist more
-        efficiently.</t>
+        independently from aggressive use of NSEC, but, is be more effective
+        when both are enabled, because the resolver can more efficently
+        determine that there is not more specific name.</t>
 
         <t>Furthermore, when aggressive use of NSEC is enabled, the aggressive
         use of cached deduced wildcard will be more effective.</t>
@@ -329,9 +328,10 @@
     <section title="Benefits">
       <t>The techniques described in this document provide a number of
       benefits, including (in no specific order):<list style="hanging">
-          <t hangText="Reduced latency">By answering directly from cache, recursive
-          resolvers can immediately inform clients that the name they are
-          looking for does not exist, improving the user experience.</t>
+          <t hangText="Reduced latency">By answering directly from cache,
+          recursive resolvers can immediately inform clients that the name
+          they are looking for does not exist, improving the user
+          experience.</t>
 
           <t hangText="Decreased recursive server load">By answering negative
           queries from the cache, recursive servers avoid having send a query
@@ -355,7 +355,7 @@
       DoS mitigation benefit. Please let us know if the below is helpful.
       Also, the below description is not as clear as it could be - it's been
       tricky to balance readability, correctness and conciseness. Text
-      gratefully accepted... ] </t>
+      gratefully accepted... ]</t>
 
       <t>The technique described in this document may also mitigate so-called
       "random QNAME attacks", in which attackers send many queries for random
@@ -425,7 +425,8 @@
     </section>
 
     <section anchor="implementation-status" title="Implementation Status">
-      <t>Unbound supports aggressive negative caching.</t>
+      <t>Unbound currenty implments aggressive negative caching, as does
+      Google Public DNS.</t>
     </section>
 
     <section anchor="acknowledgments" title="Acknowledgments">
@@ -435,11 +436,27 @@
       <t>The authors would like to specifically thank Tatuya JINMEI for
       extensive review and comments, and also Mark Andrews, Stephane
       Bortzmeyer, Casey Deccio, Alexander Dupuy, Olafur Gudmundsson, Bob
-      Harold, Shumon Huque, Pieter Lexis and Matthijs Mekking.</t>
+      Harold, Shumon Huque, Pieter Lexis and Matthijs Mekking (who even sent
+      pull requests!).</t>
     </section>
 
     <section anchor="change-history" title="Change History">
       <t>RFC Editor: Please remove this section prior to publication.</t>
+
+      <t>-02 to -03:<list style="symbols">
+          <t>Integrated a bunch of comments from Matthijs Mekking - details
+          in:
+          https://github.com/wkumari/draft-ietf-dnsop-nsec-aggressiveuse/pull/1.
+          I decided to keep "Aggressive Negative Caching" instead of
+          "Aggressive USE OF Negative Caching" for readability.</t>
+
+          <t>Attempted to address Bob Harold's comment on the readability
+          issues with "But, it will be more effective when both are
+          enabled..." in Section 5.4 -
+          https://www.ietf.org/mail-archive/web/dnsop/current/msg17997.html</t>
+
+          <t/>
+        </list></t>
 
       <t>-01 to -02:<list style="symbols">
           <t>Added Section 6 - Benefits (as suggested by Jinmei).</t>
