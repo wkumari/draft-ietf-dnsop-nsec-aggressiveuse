@@ -329,7 +329,7 @@
     <section title="Benefits">
       <t>The techniques described in this document provide a number of
       benefits, including (in no specific order):<list style="hanging">
-          <t hangText="Latency">By answering directly from cache, recursive
+          <t hangText="Reduced latency">By answering directly from cache, recursive
           resolvers can immediately inform clients that the name they are
           looking for does not exist, improving the user experience.</t>
 

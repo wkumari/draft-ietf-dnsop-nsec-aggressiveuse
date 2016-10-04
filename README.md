@@ -366,9 +366,9 @@ Internet-Draft              NSEC/NSEC3 usage              September 2016
    The techniques described in this document provide a number of
    benefits, including (in no specific order):
 
-   Latency  By answering directly from cache, recursive resolvers can
-      immediately inform clients that the name they are looking for does
-      not exist, improving the user experience.
+   Reduced latency  By answering directly from cache, recursive
+      resolvers can immediately inform clients that the name they are
+      looking for does not exist, improving the user experience.
 
    Decreased recursive server load  By answering negative queries from
       the cache, recursive servers avoid having send a query and wait
