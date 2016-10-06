@@ -214,7 +214,7 @@
 
       <t>We believe this recommendation can be relaxed because, in the absense
       of this technique, a lookup for the exact name could have come in during
-      this interval, and so this could already be cached (see <xref
+      this interval, and so a negative answer could already be cached (see <xref
       target="RFC2308"/> for more background). This means that zone operators
       should have no expectation that an added name would work immediately.
       With DNSSEC and Aggressive NSEC, the TTL of the NSEC record is the
