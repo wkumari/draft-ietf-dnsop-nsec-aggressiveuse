@@ -185,8 +185,9 @@
       providing a (DNSSEC secured) record containing the names which appear
       alphabetically before and after the queried for name. In the example
       above, if the (DNSSEC validating) recursive server were to query for
-      lion.example.com it would receive a (signed) NSEC/NSEC3 record stating
-      that there are no labels between "elephant" and "zebra". This is a
+      lion.example.com it would receive a (signed) NSEC record stating
+      that there are no labels between "elephant" and "zebra" (or,
+      for NSEC3, a similar pair of hashed names). This is a
       signed, cryptographic proof that these names are the ones before and
       after the queried for label. As lion.example.com falls within this
       range, the recursive server knows that lion.example.com really does not
