@@ -159,9 +159,10 @@
         </list></t>
 
       <t>If a validating resolver gets a query for cat.example.com, it will
-      query the example.com servers and will get back an NSEC (or NSEC3)
+      query the example.com servers and will get back an NSEC
       record stating that there are no records (alphabetically) between apple
-      and elephant. The resolver then knows that cat.example.com does not
+      and elephant, or an NSEC3 record stating there is nothing between two 
+      hashed names. The resolver then knows that cat.example.com does not
       exist; however, it does not use the fact that the proof covers a range
       (apple to elephant) to suppress queries for other labels that fall
       within this range. This means that if the validating resolver gets a
