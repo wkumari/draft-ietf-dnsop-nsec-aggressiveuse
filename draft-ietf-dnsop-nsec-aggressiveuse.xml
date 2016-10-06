@@ -296,7 +296,7 @@
         <t>The TTL value of negative information is especially important,
         because newly added domain names cannot be used while the negative
         information is effective. Section 5 of RFC 2308 states that the
-        maximum number of negative cache TTL value is 3 hours (10800). It is
+        maximum negative cache TTL value is 3 hours (10800). It is
         RECOMMENDED that validating resolvers limit the maximum effective TTL
         value of negative responses (NSEC/NSEC3 RRs) to this same value.</t>
       </section>
