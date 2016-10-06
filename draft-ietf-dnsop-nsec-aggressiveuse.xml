@@ -319,7 +319,7 @@
 
           <t hangText="Decreased authorative server load:">Because recursive
           servers can answer (negative) queries without asking the
-          authoritative server, the authoritative servers receive less
+          authoritative server, the authoritative servers receive fewer
           queries. This decreases the authoritative server bandwidth, queries
           per second and CPU utilization.</t>
         </list>The scale of the benefit depends upon multiple factors,
