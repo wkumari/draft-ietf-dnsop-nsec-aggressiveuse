@@ -305,19 +305,19 @@
     <section title="Benefits">
       <t>The techniques described in this document provide a number of
       benefits, including (in no specific order):<list style="hanging">
-          <t hangText="Reduced latency">By answering directly from cache,
+          <t hangText="Reduced latency:">By answering directly from cache,
           validating resolvers can immediately inform clients that the name
           they are looking for does not exist, improving the user
           experience.</t>
 
-          <t hangText="Decreased recursive server load">By answering negative
+          <t hangText="Decreased recursive server load:">By answering negative
           queries from the cache, validating servers avoid having to send a
           query and wait for a response. In addition to decreasing the
           bandwidth used, it also means that the server does not need to
           allocate and maintain state, thereby decreasing memory and CPU
           load.</t>
 
-          <t hangText="Decreased authorative server load">Because recursive
+          <t hangText="Decreased authorative server load:">Because recursive
           servers can answer (negative) queries without asking the
           authoritative server, the authoritative servers receive less
           queries. This decreases the authoritative server bandwidth, queries
