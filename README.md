@@ -163,7 +163,7 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
       zebra.example.com IN A 192.0.2.3
 
    If a validating resolver gets a query for cat.example.com, it will
-   query the example.com servers and will get back an NSEC (or NSEC3)
+   query the example.com servers and will get back an NSEC record
 
 
 
@@ -172,14 +172,14 @@ Fujiwara, et al.          Expires April 7, 2017                 [Page 3]
 Internet-Draft              NSEC/NSEC3 usage                October 2016
 
 
-   record starting that there are no records (alphabetically) between
-   apple and elephant.  The resolver then knows that cat.example.com
-   does not exist; however, it does not use the fact that the proof
-   covers a range (apple to elephant) to suppress queries for other
-   labels that fall within this range.  This means that if the
-   validating resolver gets a query for ball.example.com (or
-   dog.example.com) it will once again go off and query the example.com
-   servers for these names.
+   stating that there are no records (alphabetically) between apple and
+   elephant, or an NSEC3 record stating there is nothing between two
+   hashed names.  The resolver then knows that cat.example.com does not
+   exist; however, it does not use the fact that the proof covers a
+   range (apple to elephant) to suppress queries for other labels that
+   fall within this range.  This means that if the validating resolver
+   gets a query for ball.example.com (or dog.example.com) it will once
+   again go off and query the example.com servers for these names.
 
    Apart from wasting bandwidth, this also wastes resources on the
    recursive server (it needs to keep state for outstanding queries),
@@ -197,14 +197,15 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
    containing the names which appear alphabetically before and after the
    queried for name.  In the example above, if the (DNSSEC validating)
    recursive server were to query for lion.example.com it would receive
-   a (signed) NSEC/NSEC3 record stating that there are no labels between
-   "elephant" and "zebra".  This is a signed, cryptographic proof that
-   these names are the ones before and after the queried for label.  As
-   lion.example.com falls within this range, the recursive server knows
-   that lion.example.com really does not exist.  This document specifies
-   that this NSEC/NSEC3 record should be used to generate negative
-   answers for any queries that the recursive server receives that fall
-   within the range covered by the record (for the TTL for the record).
+   a (signed) NSEC record stating that there are no labels between
+   "elephant" and "zebra" (or, for NSEC3, a similar pair of hashed
+   names).  This is a signed, cryptographic proof that these names are
+   the ones before and after the queried for label.  As lion.example.com
+   falls within this range, the recursive server knows that
+   lion.example.com really does not exist.  This document specifies that
+   this NSEC/NSEC3 record should be used to generate negative answers
+   for any queries that the recursive server receives that fall within
+   the range covered by the record (for the TTL for the record).
 
    Section 4.5 of [RFC4035] says:
 
@@ -222,7 +223,6 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
 
 
 
-
 Fujiwara, et al.          Expires April 7, 2017                 [Page 4]
 
 Internet-Draft              NSEC/NSEC3 usage                October 2016
@@ -233,12 +233,12 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
 
    We believe this recommendation can be relaxed because, in the absense
    of this technique, a lookup for the exact name could have come in
-   during this interval, and so this could already be cached (see
-   [RFC2308] for more background).  This means that zone operators
-   should have no expectation that an added name would work immediately.
-   With DNSSEC and Aggressive NSEC, the TTL of the NSEC record is the
-   authoritative statement of how quickly a name can start working
-   within a zone.
+   during this interval, and so a negative answer could already be
+   cached (see [RFC2308] for more background).  This means that zone
+   operators should have no expectation that an added name would work
+   immediately.  With DNSSEC and Aggressive NSEC, the TTL of the NSEC
+   record is the authoritative statement of how quickly a name can start
+   working within a zone.
 
 5.  Aggressive Negative Caching
 
@@ -318,7 +318,7 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
    The TTL value of negative information is especially important,
    because newly added domain names cannot be used while the negative
    information is effective.  Section 5 of RFC 2308 states that the
-   maximum number of negative cache TTL value is 3 hours (10800).  It is
+   maximum negative cache TTL value is 3 hours (10800).  It is
    RECOMMENDED that validating resolvers limit the maximum effective TTL
    value of negative responses (NSEC/NSEC3 RRs) to this same value.
 
@@ -327,7 +327,7 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
    The techniques described in this document provide a number of
    benefits, including (in no specific order):
 
-   Reduced latency  By answering directly from cache, validating
+   Reduced latency:  By answering directly from cache, validating
       resolvers can immediately inform clients that the name they are
       looking for does not exist, improving the user experience.
 
@@ -340,15 +340,15 @@ Fujiwara, et al.          Expires April 7, 2017                 [Page 6]
 Internet-Draft              NSEC/NSEC3 usage                October 2016
 
 
-   Decreased recursive server load  By answering negative queries from
+   Decreased recursive server load:  By answering negative queries from
       the cache, validating servers avoid having to send a query and
       wait for a response.  In addition to decreasing the bandwidth
       used, it also means that the server does not need to allocate and
       maintain state, thereby decreasing memory and CPU load.
 
-   Decreased authorative server load  Because recursive servers can
+   Decreased authorative server load:  Because recursive servers can
       answer (negative) queries without asking the authoritative server,
-      the authoritative servers receive less queries.  This decreases
+      the authoritative servers receive fewer queries.  This decreases
       the authoritative server bandwidth, queries per second and CPU
       utilization.
 
