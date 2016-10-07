@@ -159,9 +159,10 @@
         </list></t>
 
       <t>If a validating resolver gets a query for cat.example.com, it will
-      query the example.com servers and will get back an NSEC (or NSEC3)
-      record starting that there are no records (alphabetically) between apple
-      and elephant. The resolver then knows that cat.example.com does not
+      query the example.com servers and will get back an NSEC
+      record stating that there are no records (alphabetically) between apple
+      and elephant, or an NSEC3 record stating there is nothing between two 
+      hashed names. The resolver then knows that cat.example.com does not
       exist; however, it does not use the fact that the proof covers a range
       (apple to elephant) to suppress queries for other labels that fall
       within this range. This means that if the validating resolver gets a
@@ -184,8 +185,9 @@
       providing a (DNSSEC secured) record containing the names which appear
       alphabetically before and after the queried for name. In the example
       above, if the (DNSSEC validating) recursive server were to query for
-      lion.example.com it would receive a (signed) NSEC/NSEC3 record stating
-      that there are no labels between "elephant" and "zebra". This is a
+      lion.example.com it would receive a (signed) NSEC record stating
+      that there are no labels between "elephant" and "zebra" (or,
+      for NSEC3, a similar pair of hashed names). This is a
       signed, cryptographic proof that these names are the ones before and
       after the queried for label. As lion.example.com falls within this
       range, the recursive server knows that lion.example.com really does not
@@ -212,7 +214,7 @@
 
       <t>We believe this recommendation can be relaxed because, in the absense
       of this technique, a lookup for the exact name could have come in during
-      this interval, and so this could already be cached (see <xref
+      this interval, and so a negative answer could already be cached (see <xref
       target="RFC2308"/> for more background). This means that zone operators
       should have no expectation that an added name would work immediately.
       With DNSSEC and Aggressive NSEC, the TTL of the NSEC record is the
@@ -294,7 +296,7 @@
         <t>The TTL value of negative information is especially important,
         because newly added domain names cannot be used while the negative
         information is effective. Section 5 of RFC 2308 states that the
-        maximum number of negative cache TTL value is 3 hours (10800). It is
+        maximum negative cache TTL value is 3 hours (10800). It is
         RECOMMENDED that validating resolvers limit the maximum effective TTL
         value of negative responses (NSEC/NSEC3 RRs) to this same value.</t>
       </section>
@@ -303,21 +305,21 @@
     <section title="Benefits">
       <t>The techniques described in this document provide a number of
       benefits, including (in no specific order):<list style="hanging">
-          <t hangText="Reduced latency">By answering directly from cache,
+          <t hangText="Reduced latency:">By answering directly from cache,
           validating resolvers can immediately inform clients that the name
           they are looking for does not exist, improving the user
           experience.</t>
 
-          <t hangText="Decreased recursive server load">By answering negative
+          <t hangText="Decreased recursive server load:">By answering negative
           queries from the cache, validating servers avoid having to send a
           query and wait for a response. In addition to decreasing the
           bandwidth used, it also means that the server does not need to
           allocate and maintain state, thereby decreasing memory and CPU
           load.</t>
 
-          <t hangText="Decreased authorative server load">Because recursive
+          <t hangText="Decreased authorative server load:">Because recursive
           servers can answer (negative) queries without asking the
-          authoritative server, the authoritative servers receive less
+          authoritative server, the authoritative servers receive fewer
           queries. This decreases the authoritative server bandwidth, queries
           per second and CPU utilization.</t>
         </list>The scale of the benefit depends upon multiple factors,
