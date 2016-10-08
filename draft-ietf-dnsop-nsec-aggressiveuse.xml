@@ -6,7 +6,7 @@
 <?rfc tocdepth="4"?>
 <?rfc sortrefs="yes"?>
 <?rfc symrefs="yes"?>
-<rfc category="std" docName="draft-ietf-dnsop-nsec-aggressiveuse-03"
+<rfc category="std" docName="draft-ietf-dnsop-nsec-aggressiveuse-04"
      ipr="trust200902" updates="4035">
   <front>
     <title abbrev="NSEC/NSEC3 usage">Aggressive use of NSEC/NSEC3</title>
@@ -73,7 +73,7 @@
       </address>
     </author>
 
-    <date day="4" month="October" year="2016"/>
+    <date day="7" month="October" year="2016"/>
 
     <area>operations</area>
 
@@ -90,8 +90,8 @@
       DoS attacks in some circumstances.</t>
 
       <t>This document updates RFC4035 by allowing validating resolvers to
-      generate negative answers based upon NSEC/NSEC3 records, and positive
-      answers from wildcards.</t>
+      generate negative based upon NSEC/NSEC3 records (and positive answers in
+      the presence of wildcards).</t>
 
       <t>[ Ed note: Text inside square brackets ([]) is additional background
       information, answers to frequently asked questions, general musings,
@@ -112,11 +112,12 @@
       recursive servers, and decreases privacy by leaking queries.</t>
 
       <t>This document updates RFC 4035 to allow recursive resolvers to use
-      NSEC/NSEC3 resource records to synthetize negative answers from the
+      NSEC/NSEC3 resource records to synthesize negative answers from the
       information they have in the cache. This allows validating resolvers to
       respond with NXDOMAIN immediately if the name in question falls into a
-      range expressed by a NSEC/NSEC3 resource record already in the
-      cache.</t>
+      range expressed by a NSEC/NSEC3 resource record already in the cache. It
+      also allows the synthesis of positive answers in the presence of
+      wildcard records.</t>
 
       <t>Aggressive Negative Caching was first proposed in Section 6 of DNSSEC
       Lookaside Validation (DLV) <xref target="RFC5074"/> in order to find
@@ -152,24 +153,32 @@
 
       <t>Assume that the (DNSSEC signed) "example.com" zone contains:</t>
 
-      <t><list style="empty">
-          <t>apple.example.com IN A 192.0.2.1</t>
+      <t><figure>
+          <artwork><![CDATA[apple.example.com    IN A 192.0.2.1
+elephant.example.com IN A 192.0.2.2
+*.example.com        IN A 192.0.2.3
+zebra.example.com    IN A 192.0.2.4]]></artwork>
+        </figure></t>
 
-          <t>elephant.example.com IN A 192.0.2.2</t>
-
-          <t>zebra.example.com IN A 192.0.2.3</t>
-        </list></t>
-
-      <t>If a validating resolver gets a query for cat.example.com, it will
-      query the example.com servers and will get back an NSEC record stating
-      that there are no records (alphabetically) between apple and elephant,
-      or an NSEC3 record stating there is nothing between two hashed names.
-      The resolver then knows that cat.example.com does not exist; however, it
-      does not use the fact that the proof covers a range (apple to elephant)
-      to suppress queries for other labels that fall within this range. This
-      means that if the validating resolver gets a query for ball.example.com
-      (or dog.example.com) it will once again go off and query the example.com
+      <t>If a validating resolver receives a query for cat.example.com, it
+      contacts its resolver (which may be itself) to query the example.com
+      servers and will get back an NSEC record starting that there are no
+      records (alphabetically) between apple and elephant, or an NSEC3 record
+      stating there is nothing between two hashed names. The resolver then
+      knows that cat.example.com does not exist; however, it does not use the
+      fact that the proof covers a range (apple to elephant) to suppress
+      queries for other labels that fall within this range. This means that if
+      the validating resolver gets a query for ball.example.com (or
+      dog.example.com) it will once again go off and query the example.com
       servers for these names.</t>
+
+      <t>Further, if a query is received for lion.example.com, it contacts its
+      resolver (which may be itself) to query the example.com servers and will
+      get back an NSEC record stating that there are no records
+      (alphabetically) between elephant and zebra (or an NSEC3 record stating
+      there is nothing between two hashed names), as well as an answer for
+      lion.example.com, with the label count of the signature set to two (see
+      <xref target="RFC7129"/>, section 5.3 for more details).</t>
 
       <t>Apart from wasting bandwidth, this also wastes resources on the
       recursive server (it needs to keep state for outstanding queries),
@@ -187,15 +196,19 @@
       providing a (DNSSEC secured) record containing the names which appear
       alphabetically before and after the queried for name. In the example
       above, if the (DNSSEC validating) recursive server were to query for
-      lion.example.com it would receive a (signed) NSEC record stating that
-      there are no labels between "elephant" and "zebra" (or, for NSEC3, a
+      dog.example.com it would receive a (signed) NSEC record stating that
+      there are no labels between "apple" and "elephant" (or, for NSEC3, a
       similar pair of hashed names). This is a signed, cryptographic proof
       that these names are the ones before and after the queried for label. As
-      lion.example.com falls within this range, the recursive server knows
-      that lion.example.com really does not exist. This document specifies
-      that this NSEC/NSEC3 record should be used to generate negative answers
-      for any queries that the recursive server receives that fall within the
-      range covered by the record (for the TTL for the record).</t>
+      dog.example.com falls within this range, the recursive server knows that
+      dog.example.com really does not exist.</t>
+
+      <t>This document specifies that this NSEC/NSEC3 record should be used to
+      generate negative answers for any queries that the validating server
+      receives that fall within the range covered by the record (for the TTL
+      for the record). This document also specifies that a positive answer
+      should be generated for any queries that the validating server receives
+      that are proven to be covered by a wildcard record.</t>
 
       <t><xref target="RFC4035">Section 4.5 of</xref> says:</t>
 
@@ -210,8 +223,9 @@
       (for example, via dynamic update).". In other words, if a resolver
       generates negative answers from an NSEC record, it will not send any
       queries for names within that NSEC range (for the TTL). If a new name is
-      added to the zone during this interval the resolver will not know
-      this.</t>
+      added to the zone during this interval the resolver will not know this.
+      Similarly, if the resolver is generating responses from a wildcard
+      record, it will continue to do so (for the</t>
 
       <t>We believe this recommendation can be relaxed because, in the absense
       of this technique, a lookup for the exact name could have come in during
@@ -223,11 +237,8 @@
       within a zone.</t>
     </section>
 
-    <section anchor="aggressive-negative-caching"
-             title="Aggressive Negative Caching">
-      <t/>
-
-      <t>Section 4.5 of <xref target="RFC4035"/> shows that "In theory, a
+    <section anchor="aggressive-negative-caching" title="Aggressive Caching">
+      <t>Section 4.5 of <xref target="RFC4035"/> says that "In theory, a
       resolver could use wildcards or NSEC RRs to generate positive and
       negative responses (respectively) until the TTL or signatures on the
       records in question expire. However, it seems prudent for resolvers to
@@ -240,22 +251,20 @@
       <figure>
         <artwork><![CDATA[
 +--------------------------------------------------------------+
-| Once the records are validated, DNSSEC enabled validating    |
-| resolvers SHOULD use NSEC/NSEC3 resource records to generate |
-| negative responses until their effective TTLs or signatures  |
-| for those records expire.                                    |
+|  Once the records are validated, DNSSEC enabled validating   |
+|  resolvers MAY use wildcards and NSEC/NSEC3 resource records |
+|  to generate positive and negative responses until the       |
+|  effective TTLs or signatures for those records expire.      |
 +--------------------------------------------------------------+
 ]]></artwork>
       </figure>
+
+      <t/>
 
       <t>If the validating resolver's cache has sufficient information to
       validate the query, the resolver SHOULD use NSEC/NSEC3/wildcard records
       aggressively. Otherwise, it MUST fall back to send the query to the
       authoritative DNS servers.</t>
-
-      <t>If the query name has the matching NSEC/NSEC3 RR proving the
-      information requested does not exist, the validating resolver may
-      respond with a NODATA (empty) answer.</t>
 
       <section anchor="nsec" title="NSEC">
         <t>Implementations which support aggressive use of NSEC SHOULD enable
@@ -267,35 +276,54 @@
         matching/covering the source of synthesis and an NSEC RR covering the
         query name.</t>
 
-        <t>If denial of existance can be determined according to the rules set
+        <t>If denial of existence can be determined according to the rules set
         out in <xref target="RFC4035">Section 5.4 of</xref>, using NSEC
         records in the cache, then the resolver can immediately return an
-        NXDOMAIN or NODATA response.</t>
+        NXDOMAIN or NODATA (as appropriate) response.</t>
       </section>
 
       <section anchor="nsec3" title="NSEC3">
         <t>NSEC3 aggressive negative caching is more difficult than NSEC
-        agressive caching. If the zone is signed with NSEC3, the validating
+        aggressive caching. If the zone is signed with NSEC3, the validating
         resolver needs to check the existence of non-terminals and wildcards
-        which derive from query names. </t>
+        which derive from query names.</t>
 
         <t>A validating resolver implementation MAY support aggressive use of
-        NSEC3. If it does support aggressive use of NSEC3, it MAY provide a
-        configuration switch to disable aggressive use of NSEC3 and allow it
-        to be enabled or disabled for specific zones.</t>
+        NSEC3. If it does support aggressive use of NSEC3, it SHOULD enable
+        this by default. It MAY provide a configuration switch to disable
+        aggressive use of NSEC3 and allow it to be enabled or disabled for
+        specific zones.</t>
 
-        <t> If denial of existance can be determined according to the rules
-        set out in <xref target="RFC5155"/> sections 8.4, 8.5, 8.6, 8.7,using
+        <t>If denial of existence can be determined according to the rules set
+        out in <xref target="RFC5155"/> sections 8.4, 8.5, 8.6, 8.7,using
         NSEC3 records in the cache, then the resolver can immediately return
-        an NXDOMAIN or NODATA response.</t>
+        an NXDOMAIN or NODATA response (as appropriate).</t>
 
         <t>If a covering NSEC3 RR has Opt-Out flag, the covering NSEC3 RR does
         not prove the non-existence of the domain name and the aggressive
         negative caching is not possible for the domain name.</t>
       </section>
 
+      <section title="Wildcards">
+        <t>The last paragraph of <xref target="RFC4035"/> Section 4.5 also
+        discusses the use of wildcards and NSEC RRs to generate positive
+        responses and recommends that it not be relied upon. Just like the
+        case for the aggressive use of NSEC/NSEC3 for negative answers, we
+        revise this recommendation. </t>
+
+        <t>As long as the validating resolver can determine that a name would
+        not exist without the wildcard match, it MAY synthesize an answer for
+        that name using the cached deduced wildcard. If the corresponding
+        wildcard record is not in the cache, it MUST fall back to send the
+        query to the authoritative DNS servers.</t>
+
+        <t>An implementation MAY support aggressive use of wildcards. It
+        SHOULD provide a configuration switch to disable aggressive use of
+        wildcards.</t>
+      </section>
+
       <section anchor="consideration-on-ttl" title="Consideration on TTL">
-        <t> The TTL value of negative information is especially important,
+        <t>The TTL value of negative information is especially important,
         because newly added domain names cannot be used while the negative
         information is effective.</t>
 
@@ -307,7 +335,7 @@
         <t>Section 5 of <xref target="RFC2308"/>also states that a negative
         cache entry TTL is taken from the minimum of the SOA.MINIMUM field and
         SOA's TTL. This can be less than the TTL of an NSEC or NSEC3 record,
-        since their TTL is equal to the SOA.MINIMUM field. (See <xref
+        since their TTL is equal to the SOA.MINIMUM field (see <xref
         target="RFC4035"/>section 2.3 and <xref target="RFC5155"/> section
         3.)</t>
 
@@ -315,30 +343,6 @@
         reduce the TTL of NSEC and NSEC3 records to match the TTL of the SOA
         record in the authority section of a negative response, if the SOA TTL
         is smaller.</t>
-      </section>
-
-      <section title="Wildcards">
-        <t>The last paragraph of <xref target="RFC4035"/> Section 4.5
-        discusses the aggressive use of a cached deduced wildcard (as well as
-        aggressive use of NSEC) and recommends that it not be relied upon.</t>
-
-        <t>Just like the case for the aggressive use of NSEC discussed in this
-        draft, we revise this recommendation. As long as the resolver knows a
-        name would not exist without the wildcard match, it can answer a query
-        for that name using the cached deduced wildcard, and it may be
-        justified for performance and other benefits.</t>
-
-        <t>Such aggressive use of cached deduced wildcard can be employed
-        independently from aggressive use of NSEC, but, will be more effective
-        when both are enabled as the resolver can determine the name subject
-        to wildcard would not otherwise exist more efficiently.</t>
-
-        <t>Furthermore, when aggressive use of NSEC is enabled, the aggressive
-        use of cached deduced wildcard will be more effective.</t>
-
-        <t>An implementation MAY support aggressive use of wildcards. It
-        SHOULD provide a configuration switch to disable aggressive use of
-        wildcards.</t>
       </section>
     </section>
 
@@ -362,10 +366,13 @@
           authoritative server, the authoritative servers receive fewer
           queries. This decreases the authoritative server bandwidth, queries
           per second and CPU utilization.</t>
-        </list>The scale of the benefit depends upon multiple factors,
-      including the query distribution. For example, currently around 65% of
-      queries to Root Name servers result in NXDOMAIN responses; this
-      technique will eliminate a sizable quantity of these.</t>
+        </list></t>
+
+      <t>The scale of the benefit depends upon multiple factors, including the
+      query distribution. For example, at the time of this writing, around 65%
+      of queries to Root Name servers result in NXDOMAIN responses (see statis
+      <xref target="root-servers.org"/>); this technique will eliminate a
+      sizable quantity of these.</t>
 
       <t>The technique described in this document may also mitigate so-called
       "random QNAME attacks", in which attackers send many queries for random
@@ -395,8 +402,8 @@
 +--------------------------------------------------------------+
 |  Once the records are validated, DNSSEC enabled validating   |
 |  resolvers MAY use wildcards and NSEC/NSEC3 resource records |
-|  to generate negative responses until their effective TTLs   |
-|  or signatures for those records expire.                     |
+|  to generate positive and negative responses until the       |
+|  effective TTLs or signatures for those records expire.      |
 +--------------------------------------------------------------+
 ]]></artwork>
       </figure>
@@ -407,9 +414,9 @@
     </section>
 
     <section anchor="securitycons" title="Security Considerations">
-      <t>Aggressive use of NSEC / NSEC3 resource records without DNSSEC
-      validation may create serious security issues, and so this technique
-      requires DNSSEC validation.</t>
+      <t>Use of NSEC / NSEC3 resource records without DNSSEC validation may
+      create serious security issues, and so this technique requires DNSSEC
+      validation.</t>
 
       <t>Newly registered resource records may not be used immediately.
       However, choosing suitable TTL value and negative cache TTL value (SOA
@@ -422,7 +429,7 @@
       proposal are recommended to have a configurable maximum value of NSEC
       RRs in the negative cache.</t>
 
-      <t> Although the TTL of NSEC/NSEC3 records is typically fairly short
+      <t>Although the TTL of NSEC/NSEC3 records is typically fairly short
       (minutes or hours), their RRSIG expiration time can be much further in
       the future (weeks). An attacker who is able to successfully spoof
       responses might poison a cache with old NSEC/NSEC3 records. If the
@@ -446,143 +453,170 @@
       Mark Andrews, Casey Deccio, Alexander Dupuy, Olafur Gudmundsson, Bob
       Harold, Shumon Huque, John Levine, Pieter Lexis and Matthijs Mekking
       (who even sent pull requests!).</t>
-    </section>
 
-    <section anchor="change-history" title="Change History">
-      <t>RFC Editor: Please remove this section prior to publication.</t>
+      <section anchor="change-history" title="Change History">
+        <t>RFC Editor: Please remove this section prior to publication.</t>
 
-      <t>-03 to -04:<list style="symbols">
-          <t>Working group does want the "positive" answers, not just negative
-          ones. This requires readding what used to be Section 7, and some
-          fixups / clarifications. </t>
+        <t>-03 to -04:<list style="symbols">
+            <t>Working group does want the "positive" answers, not just
+            negative ones. This requires readding what used to be Section 7,
+            and a bunch of cleanup, including:<list style="symbols">
+                <t>Additional text in the Problem Statement</t>
 
-          <t>Incorporated pull request from Tony Finch (thanks!):
-          https://github.com/wkumari/draft-ietf-dnsop-nsec-aggressiveuse/pull/1</t>
+                <t>Added a wildcard record to the zone.</t>
 
-          <t>More fixups from Tony (including text):
-          https://www.ietf.org/mail-archive/web/dnsop/current/msg18271.html.
-          This included much clearer text on TTL, refernces to the NSEC /
-          NSEC3 RFCs (instead of my clumsy summary), good text on replays,
-          etc. </t>
-        </list></t>
+                <t>Added "or positive answers from wildcards" type text (where
+                appropriate) to explain that this isn't just for negative
+                answers.</t>
 
-      <t>-02 to -03:<list style="symbols">
-          <t>Integrated a bunch of comments from Matthijs Mekking - details
-          in:
-          https://github.com/wkumari/draft-ietf-dnsop-nsec-aggressiveuse/pull/1.
-          I decided to keep "Aggressive Negative Caching" instead of
-          "Aggressive USE OF Negative Caching" for readability.</t>
+                <t>Reworded much of the Wildcard text.</t>
+              </list></t>
 
-          <t>Attempted to address Bob Harold's comment on the readability
-          issues with "But, it will be more effective when both are
-          enabled..." in Section 5.4 -
-          https://www.ietf.org/mail-archive/web/dnsop/current/msg17997.html</t>
+            <t>Incorporated pull request from Tony Finch (thanks!):
+            https://github.com/wkumari/draft-ietf-dnsop-nsec-aggressiveuse/pull/1</t>
 
-          <t>MAYs and SHOULD drifted in the text block. Fixed - thanks to
-          https://mailarchive.ietf.org/arch/msg/dnsop/2ljmmzxtIMCFMLOZmWcSbTYVOy4</t>
+            <t>More fixups from Tony (including text):
+            https://www.ietf.org/mail-archive/web/dnsop/current/msg18271.html.
+            This included much clearer text on TTL, refernces to the NSEC /
+            NSEC3 RFCs (instead of my clumsy summary), good text on replays,
+            etc.</t>
 
-          <t>A number of good edits from Stephane in:
-          https://www.ietf.org/mail-archive/web/dnsop/current/msg18109.html</t>
+            <t>Converted the "zone file" to a figure to make it more
+            readable.</t>
 
-          <t>A bunch more edits from Jinmei, as in:
-          https://www.ietf.org/mail-archive/web/dnsop/current/msg18206.html</t>
-        </list></t>
+            <t>Text from Tim W: "If a validating resolver receives a query for
+            cat.example.com, it contacts its resolver (which may be itself) to
+            query..." - which satisfies Jinmei's concern (which I was too
+            dense to grock).</t>
 
-      <t>-01 to -02:<list style="symbols">
-          <t>Added Section 6 - Benefits (as suggested by Jinmei).</t>
-
-          <t>Removed Appendix B (Jinmei)</t>
-
-          <t>Replaced "full-service" with "validating" (where applicable)</t>
-
-          <t>Integrated other comments from Jinmei from
-          https://www.ietf.org/mail-archive/web/dnsop/current/msg17875.html</t>
-
-          <t>Integrated comment from co-authors, including re-adding parts of
-          Appendix B, terminology, typos.</t>
-
-          <t>Tried to explain under what conditions this may actually mitigate
-          attacks.</t>
-        </list></t>
-
-      <t>-00 to -01:<list style="symbols">
-          <t>Comments from DNSOP meeting in Berlin.</t>
-
-          <t>Changed intended status to Standards Track (updates RFC 4035)</t>
-
-          <t>Added a section "Updates to RFC 4035"</t>
-
-          <t>Some language clarification / typo / cleanup</t>
-
-          <t>Cleaned up the TTL section a bit.</t>
-
-          <t>Removed Effects section, Additional proposal section, and pseudo
-          code.</t>
-
-          <t>Moved "mitigation of random subdomain attacks" to Appendix.</t>
-        </list></t>
-
-      <t>From draft-fujiwara-dnsop-nsec-aggressiveuse-03 -&gt;
-      draft-ietf-dnsop-nsec-aggressiveuse<list style="symbols">
-          <t>Document adopted by DNSOP WG.</t>
-
-          <t>Adoption comments</t>
-
-          <t>Changed main purpose to performance</t>
-
-          <t>Use NSEC3/Wildcard keywords</t>
-
-          <t>Improved wordings (from good comments)</t>
-
-          <t>Simplified pseudo code for NSEC3</t>
-
-          <t>Added Warren as co-author.</t>
-
-          <t>Reworded much of the problem statement</t>
-
-          <t>Reworked examples to better explain the problem / solution.</t>
-        </list></t>
-
-      <section anchor="version-draft-fujiwara-dnsop-nsec-aggressiveuse-01"
-               title="Version draft-fujiwara-dnsop-nsec-aggressiveuse-01">
-        <t><list style="symbols">
-            <t>Added reference to DLV <xref target="RFC5074"/> and imported
-            some sentences.</t>
-
-            <t>Added Aggressive Negative Caching Flag idea.</t>
-
-            <t>Added detailed algorithms.</t>
+            <t>Fixup of the "validation required" in security
+            considerations.</t>
           </list></t>
+
+        <t>-02 to -03:<list style="symbols">
+            <t>Integrated a bunch of comments from Matthijs Mekking - details
+            in:
+            https://github.com/wkumari/draft-ietf-dnsop-nsec-aggressiveuse/pull/1.
+            I decided to keep "Aggressive Negative Caching" instead of
+            "Aggressive USE OF Negative Caching" for readability.</t>
+
+            <t>Attempted to address Bob Harold's comment on the readability
+            issues with "But, it will be more effective when both are
+            enabled..." in Section 5.4 -
+            https://www.ietf.org/mail-archive/web/dnsop/current/msg17997.html</t>
+
+            <t>MAYs and SHOULD drifted in the text block. Fixed - thanks to
+            https://mailarchive.ietf.org/arch/msg/dnsop/2ljmmzxtIMCFMLOZmWcSbTYVOy4</t>
+
+            <t>A number of good edits from Stephane in:
+            https://www.ietf.org/mail-archive/web/dnsop/current/msg18109.html</t>
+
+            <t>A bunch more edits from Jinmei, as in:
+            https://www.ietf.org/mail-archive/web/dnsop/current/msg18206.html</t>
+          </list></t>
+
+        <t>-01 to -02:<list style="symbols">
+            <t>Added Section 6 - Benefits (as suggested by Jinmei).</t>
+
+            <t>Removed Appendix B (Jinmei)</t>
+
+            <t>Replaced "full-service" with "validating" (where
+            applicable)</t>
+
+            <t>Integrated other comments from Jinmei from
+            https://www.ietf.org/mail-archive/web/dnsop/current/msg17875.html</t>
+
+            <t>Integrated comment from co-authors, including re-adding parts
+            of Appendix B, terminology, typos.</t>
+
+            <t>Tried to explain under what conditions this may actually
+            mitigate attacks.</t>
+          </list></t>
+
+        <t>-00 to -01:<list style="symbols">
+            <t>Comments from DNSOP meeting in Berlin.</t>
+
+            <t>Changed intended status to Standards Track (updates RFC
+            4035)</t>
+
+            <t>Added a section "Updates to RFC 4035"</t>
+
+            <t>Some language clarification / typo / cleanup</t>
+
+            <t>Cleaned up the TTL section a bit.</t>
+
+            <t>Removed Effects section, Additional proposal section, and
+            pseudo code.</t>
+
+            <t>Moved "mitigation of random subdomain attacks" to Appendix.</t>
+          </list></t>
+
+        <t>From draft-fujiwara-dnsop-nsec-aggressiveuse-03 -&gt;
+        draft-ietf-dnsop-nsec-aggressiveuse<list style="symbols">
+            <t>Document adopted by DNSOP WG.</t>
+
+            <t>Adoption comments</t>
+
+            <t>Changed main purpose to performance</t>
+
+            <t>Use NSEC3/Wildcard keywords</t>
+
+            <t>Improved wordings (from good comments)</t>
+
+            <t>Simplified pseudo code for NSEC3</t>
+
+            <t>Added Warren as co-author.</t>
+
+            <t>Reworded much of the problem statement</t>
+
+            <t>Reworked examples to better explain the problem / solution.</t>
+          </list></t>
+
+        <section anchor="version-draft-fujiwara-dnsop-nsec-aggressiveuse-01"
+                 title="Version draft-fujiwara-dnsop-nsec-aggressiveuse-01">
+          <t><list style="symbols">
+              <t>Added reference to DLV <xref target="RFC5074"/> and imported
+              some sentences.</t>
+
+              <t>Added Aggressive Negative Caching Flag idea.</t>
+
+              <t>Added detailed algorithms.</t>
+            </list></t>
+        </section>
+
+        <section anchor="version-draft-fujiwara-dnsop-nsec-aggressiveuse-02"
+                 title="Version draft-fujiwara-dnsop-nsec-aggressiveuse-02">
+          <t><list style="symbols">
+              <t>Added reference to <xref
+              target="I-D.vixie-dnsext-resimprove"/></t>
+
+              <t>Added considerations for the CD bit</t>
+
+              <t>Updated detailed algorithms.</t>
+
+              <t>Moved Aggressive Negative Caching Flag idea into Additional
+              Proposals</t>
+            </list></t>
+        </section>
+
+        <section anchor="version-draft-fujiwara-dnsop-nsec-aggressiveuse-03"
+                 title="Version draft-fujiwara-dnsop-nsec-aggressiveuse-03">
+          <t><list style="symbols">
+              <t>Added "Partial implementation"</t>
+
+              <t>Section 4,5,6 reorganized for better representation</t>
+
+              <t>Added NODATA answer in Section 4</t>
+
+              <t>Trivial updates</t>
+
+              <t>Updated pseudo code</t>
+            </list></t>
+        </section>
       </section>
 
-      <section anchor="version-draft-fujiwara-dnsop-nsec-aggressiveuse-02"
-               title="Version draft-fujiwara-dnsop-nsec-aggressiveuse-02">
-        <t><list style="symbols">
-            <t>Added reference to <xref
-            target="I-D.vixie-dnsext-resimprove"/></t>
-
-            <t>Added considerations for the CD bit</t>
-
-            <t>Updated detailed algorithms.</t>
-
-            <t>Moved Aggressive Negative Caching Flag idea into Additional
-            Proposals</t>
-          </list></t>
-      </section>
-
-      <section anchor="version-draft-fujiwara-dnsop-nsec-aggressiveuse-03"
-               title="Version draft-fujiwara-dnsop-nsec-aggressiveuse-03">
-        <t><list style="symbols">
-            <t>Added "Partial implementation"</t>
-
-            <t>Section 4,5,6 reorganized for better representation</t>
-
-            <t>Added NODATA answer in Section 4</t>
-
-            <t>Trivial updates</t>
-
-            <t>Updated pseudo code</t>
-          </list></t>
+      <section title="new section">
+        <t/>
       </section>
     </section>
   </middle>
@@ -819,6 +853,8 @@
 
         <seriesInfo name="DOI" value="10.17487/RFC7719"/>
       </reference>
+
+      <?rfc include='reference.RFC.7129'?>
     </references>
 
     <references title="Informative References">
@@ -890,6 +926,20 @@
 
         <format target="http://www.ietf.org/internet-drafts/draft-ietf-dnsop-nxdomain-cut-03.txt"
                 type="TXT"/>
+      </reference>
+
+      <reference anchor="root-servers.org"
+                 target="http://www.root-servers.org/">
+        <front>
+          <title abbrev="Autonomous System (AS) Number">Root Server Technical
+          Operations Assn</title>
+
+          <author>
+            <organization>IANA</organization>
+          </author>
+
+          <date/>
+        </front>
       </reference>
     </references>
 
