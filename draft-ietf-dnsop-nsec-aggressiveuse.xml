@@ -154,30 +154,37 @@
       <t>Assume that the (DNSSEC signed) "example.com" zone contains:</t>
 
       <t><figure>
-          <artwork><![CDATA[apple.example.com    IN A 192.0.2.1
-elephant.example.com IN A 192.0.2.2
-*.example.com        IN A 192.0.2.3
-zebra.example.com    IN A 192.0.2.4]]></artwork>
+          <artwork><![CDATA[albatross.example.com IN A 192.0.2.1
+elephant.example.com  IN A 192.0.2.2
+zebra.example.com     IN A 192.0.2.3]]></artwork>
         </figure></t>
 
       <t>If a validating resolver receives a query for cat.example.com, it
       contacts its resolver (which may be itself) to query the example.com
       servers and will get back an NSEC record starting that there are no
-      records (alphabetically) between apple and elephant, or an NSEC3 record
-      stating there is nothing between two hashed names. The resolver then
-      knows that cat.example.com does not exist; however, it does not use the
-      fact that the proof covers a range (apple to elephant) to suppress
-      queries for other labels that fall within this range. This means that if
-      the validating resolver gets a query for ball.example.com (or
-      dog.example.com) it will once again go off and query the example.com
+      records (alphabetically) between albatross and elephant, or an NSEC3
+      record stating there is nothing between two hashed names. The resolver
+      then knows that cat.example.com does not exist; however, it does not use
+      the fact that the proof covers a range (albatross to elephant) to
+      suppress queries for other labels that fall within this range. This
+      means that if the validating resolver gets a query for ball.example.com
+      (or dog.example.com) it will once again go off and query the example.com
       servers for these names.</t>
 
-      <t>Further, if a query is received for lion.example.com, it contacts its
-      resolver (which may be itself) to query the example.com servers and will
-      get back an NSEC record stating that there are no records
-      (alphabetically) between elephant and zebra (or an NSEC3 record stating
-      there is nothing between two hashed names), as well as an answer for
-      lion.example.com, with the label count of the signature set to two (see
+      <t>Now, assume that the (DNSSEC signed) "example.org" zone contains:</t>
+
+      <t><figure>
+          <artwork><![CDATA[avocado.example.org   IN A 192.0.2.1
+*.example.org         IN A 192.0.2.2
+zucchini.example.org IN A 192.0.2.3]]></artwork>
+        </figure></t>
+
+      <t>If a query is received for leek.example.org, it contacts its resolver
+      (which may be itself) to query the example.org servers and will get back
+      an NSEC record stating that there are no records (alphabetically)
+      between avocado and zucchini (or an NSEC3 record stating there is
+      nothing between two hashed names), as well as an answer for
+      leek.example.org, with the label count of the signature set to two (see
       <xref target="RFC7129"/>, section 5.3 for more details).</t>
 
       <t>Apart from wasting bandwidth, this also wastes resources on the
@@ -194,10 +201,10 @@ zebra.example.com    IN A 192.0.2.4]]></artwork>
       provide "authenticated denial of existence"; this is a cryptographic
       proof that the queried for name does not exist, accomplished by
       providing a (DNSSEC secured) record containing the names which appear
-      alphabetically before and after the queried for name. In the example
-      above, if the (DNSSEC validating) recursive server were to query for
-      dog.example.com it would receive a (signed) NSEC record stating that
-      there are no labels between "apple" and "elephant" (or, for NSEC3, a
+      alphabetically before and after the queried for name. In the first
+      example above, if the (DNSSEC validating) recursive server were to query
+      for dog.example.com it would receive a (signed) NSEC record stating that
+      there are no labels between "albatross" and "elephant" (or, for NSEC3, a
       similar pair of hashed names). This is a signed, cryptographic proof
       that these names are the ones before and after the queried for label. As
       dog.example.com falls within this range, the recursive server knows that
@@ -309,7 +316,7 @@ zebra.example.com    IN A 192.0.2.4]]></artwork>
         discusses the use of wildcards and NSEC RRs to generate positive
         responses and recommends that it not be relied upon. Just like the
         case for the aggressive use of NSEC/NSEC3 for negative answers, we
-        revise this recommendation. </t>
+        revise this recommendation.</t>
 
         <t>As long as the validating resolver can determine that a name would
         not exist without the wildcard match, it MAY synthesize an answer for
@@ -440,6 +447,10 @@ zebra.example.com    IN A 192.0.2.4]]></artwork>
     </section>
 
     <section anchor="implementation-status" title="Implementation Status">
+      <t>[ Editor note: RFC Editor, please remove this entire section. RFC6982
+      says: "Since this information is necessarily time dependent, it is
+      inappropriate for inclusion in a published RFC." ]</t>
+
       <t>Unbound currenty implements aggressive negative caching, as does
       Google Public DNS.</t>
     </section>
@@ -456,6 +467,13 @@ zebra.example.com    IN A 192.0.2.4]]></artwork>
 
       <section anchor="change-history" title="Change History">
         <t>RFC Editor: Please remove this section prior to publication.</t>
+
+        <t>-04 to -05:<list style="symbols">
+            <t>Bob pointed out that I did a stupid - when I added the wildcard
+            to 'example.com' I made the example wrong / confusing. I have
+            attempted to fix this by adding a second example zone
+            (example.org) with the wildcard instead.</t>
+          </list></t>
 
         <t>-03 to -04:<list style="symbols">
             <t>Working group does want the "positive" answers, not just
