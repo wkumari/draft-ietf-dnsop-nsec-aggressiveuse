@@ -269,7 +269,7 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
       <t/>
 
       <t>If the negative cache of the validating resolver has sufficient
-      information to validate the query, the resolver MAY use NSEC, NSEC3
+      information to validate the query, the resolver SHOULD use NSEC, NSEC3
       and wildcard records aggressively. Otherwise, it MUST fall back to
       send the query to the authoritative DNS servers.</t>
 

@@ -294,9 +294,9 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
    +--------------------------------------------------------------+
 
    If the negative cache of the validating resolver has sufficient
-   information to validate the query, the resolver MAY use NSEC, NSEC3
-   and wildcard records aggressively.  Otherwise, it MUST fall back to
-   send the query to the authoritative DNS servers.
+   information to validate the query, the resolver SHOULD use NSEC,
+   NSEC3 and wildcard records aggressively.  Otherwise, it MUST fall
+   back to send the query to the authoritative DNS servers.
 
    It is recommended that resolvers that implement Aggressive Negative
    Caching provide a configuration switch to disable the feature.
