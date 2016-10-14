@@ -297,7 +297,7 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
         which derive from query names.</t>
 
         <t>If denial of existence can be determined according to the rules set
-        out in <xref target="RFC5155"/> sections 8.4, 8.5, 8.6, 8.7,using
+        out in <xref target="RFC5155"/> Sections 8.4, 8.5, 8.6, 8.7, using
         NSEC3 records in the cache, then the resolver can immediately return
         an NXDOMAIN or NODATA response (as appropriate).</t>
 
@@ -314,10 +314,12 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
         revise this recommendation.</t>
 
         <t>As long as the validating resolver can determine that a name would
-        not exist without the wildcard match, it SHOULD synthesize an answer
-        for that name using the cached deduced wildcard. If the corresponding
-        wildcard record is not in the cache, it MUST fall back to send the
-        query to the authoritative DNS servers.</t>
+        not exist without the wildcard match, determined according to the
+        rules set out in <xref target="RFC4035">Section 5.3.4 of</xref> (NSEC),
+        or in <xref target="RFC5155">Section 8.8 of</xref>, it SHOULD
+        synthesize an answer for that name using the cached deduced wildcard.
+        If the corresponding wildcard record is not in the cache, it MUST fall
+        back to send the query to the authoritative DNS servers.</t>
       </section>
 
       <section anchor="consideration-on-ttl" title="Consideration on TTL">

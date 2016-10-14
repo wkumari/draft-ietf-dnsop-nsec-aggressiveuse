@@ -323,7 +323,7 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
    which derive from query names.
 
    If denial of existence can be determined according to the rules set
-   out in [RFC5155] sections 8.4, 8.5, 8.6, 8.7,using NSEC3 records in
+   out in [RFC5155] Sections 8.4, 8.5, 8.6, 8.7, using NSEC3 records in
    the cache, then the resolver can immediately return an NXDOMAIN or
    NODATA response (as appropriate).
 
@@ -349,10 +349,12 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
    recommendation.
 
    As long as the validating resolver can determine that a name would
-   not exist without the wildcard match, it SHOULD synthesize an answer
-   for that name using the cached deduced wildcard.  If the
-   corresponding wildcard record is not in the cache, it MUST fall back
-   to send the query to the authoritative DNS servers.
+   not exist without the wildcard match, determined according to the
+   rules set out in Section 5.3.4 of [RFC4035] (NSEC), or in Section 8.8
+   of [RFC5155], it SHOULD synthesize an answer for that name using the
+   cached deduced wildcard.  If the corresponding wildcard record is not
+   in the cache, it MUST fall back to send the query to the
+   authoritative DNS servers.
 
 5.4.  Consideration on TTL
 
@@ -385,9 +387,7 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
       resolvers can immediately inform clients that the name they are
       looking for does not exist, improving the user experience.
 
-   Decreased recursive server load:  By answering negative queries from
-      the cache, validating servers avoid having to send a query and
-      wait for a response.  In addition to decreasing the bandwidth
+
 
 
 
@@ -396,6 +396,9 @@ Fujiwara, et al.         Expires April 10, 2017                 [Page 7]
 Internet-Draft              NSEC/NSEC3 usage                October 2016
 
 
+   Decreased recursive server load:  By answering negative queries from
+      the cache, validating servers avoid having to send a query and
+      wait for a response.  In addition to decreasing the bandwidth
       used, it also means that the server does not need to allocate and
       maintain state, thereby decreasing memory and CPU load.
 
@@ -440,9 +443,6 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
    |  to generate positive and negative responses until the       |
    |  effective TTLs or signatures for those records expire.      |
    +--------------------------------------------------------------+
-
-
-
 
 
 
