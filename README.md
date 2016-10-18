@@ -99,15 +99,15 @@ Table of Contents
    11. Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .   9
      11.1.  Change History . . . . . . . . . . . . . . . . . . . . .  10
        11.1.1.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-01 .  12
-       11.1.2.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-02 .  12
+       11.1.2.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-02 .  13
        11.1.3.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-03 .  13
      11.2.  new section  . . . . . . . . . . . . . . . . . . . . . .  13
    12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  13
      12.1.  Normative References . . . . . . . . . . . . . . . . . .  13
      12.2.  Informative References . . . . . . . . . . . . . . . . .  14
    Appendix A.  Detailed implementation notes  . . . . . . . . . . .  14
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  15
-
+   Appendix B.  Procedure for determining ENT vs NXDOMAN . . . . . .  15
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  16
 
 
 
@@ -411,8 +411,8 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
    The scale of the benefit depends upon multiple factors, including the
    query distribution.  For example, at the time of this writing, around
    65% of queries to Root Name servers result in NXDOMAIN responses (see
-   statis [root-servers.org]); this technique will eliminate a sizable
-   quantity of these.
+   statistics from [root-servers.org]); this technique will eliminate a
+   sizable quantity of these.
 
    The technique described in this document may also mitigate so-called
    "random QNAME attacks", in which attackers send many queries for
@@ -499,7 +499,7 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
    The authors would like to specifically thank Stephane Bortzmeyer,
    Tony Finch, Tatuya JINMEI for extensive review and comments, and also
    Mark Andrews, Casey Deccio, Alexander Dupuy, Olafur Gudmundsson, Bob
-
+   Harold, Shumon Huque, John Levine, Pieter Lexis and Matthijs Mekking
 
 
 
@@ -508,8 +508,9 @@ Fujiwara, et al.         Expires April 10, 2017                 [Page 9]
 Internet-Draft              NSEC/NSEC3 usage                October 2016
 
 
-   Harold, Shumon Huque, John Levine, Pieter Lexis and Matthijs Mekking
-   (who even sent pull requests!).
+   (who even sent pull requests!).  Mark Andrews also provided the text
+   (https://www.ietf.org/mail-archive/web/dnsop/current/msg18332.html)
+   which we made into Appendix B
 
 11.1.  Change History
 
@@ -522,10 +523,15 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
       attempted to fix this by adding a second example zone
       (example.org) with the wildcard instead.
 
+   o  More helpful changes (in a pull request, thanks!) from Matthijs
+
+   o  Included Mark Andrew's useful explanation of how to tell ENT from
+      NXD as an Appendix.
+
    -03 to -04:
 
    o  Working group does want the "positive" answers, not just negative
-      ones.  This requires readding what used to be Section 7, and a
+      ones.  This requires reading what used to be Section 7, and a
       bunch of cleanup, including:
 
       *  Additional text in the Problem Statement
@@ -549,12 +555,6 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
 
    o  Converted the "zone file" to a figure to make it more readable.
 
-   o  Text from Tim W: "If a validating resolver receives a query for
-      cat.example.com, it contacts its resolver (which may be itself) to
-      query..." - which satisfies Jinmei's concern (which I was too
-      dense to grock).
-
-   o  Fixup of the "validation required" in security considerations.
 
 
 
@@ -563,6 +563,13 @@ Fujiwara, et al.         Expires April 10, 2017                [Page 10]
 
 Internet-Draft              NSEC/NSEC3 usage                October 2016
 
+
+   o  Text from Tim W: "If a validating resolver receives a query for
+      cat.example.com, it contacts its resolver (which may be itself) to
+      query..." - which satisfies Jinmei's concern (which I was too
+      dense to grock).
+
+   o  Fixup of the "validation required" in security considerations.
 
    -02 to -03:
 
@@ -605,13 +612,6 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
 
    -00 to -01:
 
-   o  Comments from DNSOP meeting in Berlin.
-
-   o  Changed intended status to Standards Track (updates RFC 4035)
-
-   o  Added a section "Updates to RFC 4035"
-
-   o  Some language clarification / typo / cleanup
 
 
 
@@ -619,6 +619,14 @@ Fujiwara, et al.         Expires April 10, 2017                [Page 11]
 
 Internet-Draft              NSEC/NSEC3 usage                October 2016
 
+
+   o  Comments from DNSOP meeting in Berlin.
+
+   o  Changed intended status to Standards Track (updates RFC 4035)
+
+   o  Added a section "Updates to RFC 4035"
+
+   o  Some language clarification / typo / cleanup
 
    o  Cleaned up the TTL section a bit.
 
@@ -656,6 +664,18 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
 
    o  Added detailed algorithms.
 
+
+
+
+
+
+
+
+Fujiwara, et al.         Expires April 10, 2017                [Page 12]
+
+Internet-Draft              NSEC/NSEC3 usage                October 2016
+
+
 11.1.2.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-02
 
    o  Added reference to [I-D.vixie-dnsext-resimprove]
@@ -666,15 +686,6 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
 
    o  Moved Aggressive Negative Caching Flag idea into Additional
       Proposals
-
-
-
-
-
-Fujiwara, et al.         Expires April 10, 2017                [Page 12]
-
-Internet-Draft              NSEC/NSEC3 usage                October 2016
-
 
 11.1.3.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-03
 
@@ -695,8 +706,8 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
 12.1.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
-              Requirement Levels", BCP 14, RFC 2119,
-              DOI 10.17487/RFC2119, March 1997,
+              Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/
+              RFC2119, March 1997,
               <http://www.rfc-editor.org/info/rfc2119>.
 
    [RFC2308]  Andrews, M., "Negative Caching of DNS Queries (DNS
@@ -712,6 +723,15 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
               System", RFC 4592, DOI 10.17487/RFC4592, July 2006,
               <http://www.rfc-editor.org/info/rfc4592>.
 
+
+
+
+
+Fujiwara, et al.         Expires April 10, 2017                [Page 13]
+
+Internet-Draft              NSEC/NSEC3 usage                October 2016
+
+
    [RFC5074]  Weiler, S., "DNSSEC Lookaside Validation (DLV)", RFC 5074,
               DOI 10.17487/RFC5074, November 2007,
               <http://www.rfc-editor.org/info/rfc5074>.
@@ -724,13 +744,6 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
    [RFC7129]  Gieben, R. and W. Mekking, "Authenticated Denial of
               Existence in the DNS", RFC 7129, DOI 10.17487/RFC7129,
               February 2014, <http://www.rfc-editor.org/info/rfc7129>.
-
-
-
-Fujiwara, et al.         Expires April 10, 2017                [Page 13]
-
-Internet-Draft              NSEC/NSEC3 usage                October 2016
-
 
    [RFC7719]  Hoffman, P., Sullivan, A., and K. Fujiwara, "DNS
               Terminology", RFC 7719, DOI 10.17487/RFC7719, December
@@ -766,6 +779,15 @@ Appendix A.  Detailed implementation notes
       not make queries for any name covered by a cached and validated
       NSEC record.  Furthermore, a validator answering queries from
       clients will synthesize a negative answer whenever it has an
+
+
+
+
+Fujiwara, et al.         Expires April 10, 2017                [Page 14]
+
+Internet-Draft              NSEC/NSEC3 usage                October 2016
+
+
       applicable validated NSEC in its cache unless the CD bit was set
       on the incoming query.  (Imported from Section 6 of [RFC5074]).
 
@@ -779,19 +801,48 @@ Appendix A.  Detailed implementation notes
    o  The aggressive negative caching may be inserted at the cache
       lookup part of the recursive resolvers.
 
-
-
-
-
-Fujiwara, et al.         Expires April 10, 2017                [Page 14]
-
-Internet-Draft              NSEC/NSEC3 usage                October 2016
-
-
    o  If errors happen in aggressive negative caching algorithm,
       resolvers MUST fall back to resolve the query as usual.  "Resolve
       the query as usual" means that the resolver must process the query
       as though it does not implement aggressive negative caching.
+
+Appendix B.  Procedure for determining ENT vs NXDOMAN
+
+   Thanks to Mark Andrews for providing these helpful notes for
+   implementors.  As they are more general than for Aggressive NSEC we
+   have placed them in an appendix.
+
+   If the NSEC record has not been verified as secure discard it.
+
+   If the given name sorts before or matches the NSEC owner name discard
+   it as it does not prove the NXDOMAIN or ENT.
+
+   If the given name is a subdomain of the NSEC owner name and the NS
+   bit is present and the SOA bit is absent then discard the NSEC as it
+   is from a parent zone.
+
+   If the next domain name sorts after the NSEC owner name and the given
+   name sorts after or matches next domain name then discard the NSEC
+   record as it does not prove the NXDOMAIN or ENT.
+
+   If the next domain name sorts before or matches the NSEC owner name
+   and the given name is not a subdomain of the next domain name then
+   discard the NSEC as it does not prove the NXDOMAIN or ENT.
+
+   You now have a NSEC record that proves the NXDOMAIN or ENT.
+
+   If the next domain name is a subdomain of the given name you have a
+   ENT otherwise you have a NXDOMAIN.
+
+
+
+
+
+
+Fujiwara, et al.         Expires April 10, 2017                [Page 15]
+
+Internet-Draft              NSEC/NSEC3 usage                October 2016
+
 
 Authors' Addresses
 
@@ -839,5 +890,10 @@ Authors' Addresses
 
 
 
-Fujiwara, et al.         Expires April 10, 2017                [Page 15]
+
+
+
+
+
+Fujiwara, et al.         Expires April 10, 2017                [Page 16]
 ```

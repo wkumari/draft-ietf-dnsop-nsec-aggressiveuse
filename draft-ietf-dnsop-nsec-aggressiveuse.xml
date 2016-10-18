@@ -244,7 +244,8 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
       within a zone.</t>
     </section>
 
-    <section anchor="aggressive-negative-caching" title="Aggressive Negative Caching">
+    <section anchor="aggressive-negative-caching"
+             title="Aggressive Negative Caching">
       <t>Section 4.5 of <xref target="RFC4035"/> says that "In theory, a
       resolver could use wildcards or NSEC RRs to generate positive and
       negative responses (respectively) until the TTL or signatures on the
@@ -270,14 +271,14 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
 
       <t>If the negative cache of the validating resolver has sufficient
       information to validate the query, the resolver SHOULD use NSEC, NSEC3
-      and wildcard records aggressively. Otherwise, it MUST fall back to
-      send the query to the authoritative DNS servers.</t>
+      and wildcard records aggressively. Otherwise, it MUST fall back to send
+      the query to the authoritative DNS servers.</t>
 
-      <t>It is recommended that resolvers that implement Aggressive
-      Negative Caching provide a configuration switch to disable the
-      feature. Separate configuration switches may be implemented for
-      the aggressive use of NSEC, NSEC3 and wildcard records, and
-      it is recommended to enable aggressive negative caching by default.</t>
+      <t>It is recommended that resolvers that implement Aggressive Negative
+      Caching provide a configuration switch to disable the feature. Separate
+      configuration switches may be implemented for the aggressive use of
+      NSEC, NSEC3 and wildcard records, and it is recommended to enable
+      aggressive negative caching by default.</t>
 
       <section anchor="nsec" title="NSEC">
         <t>The validating resolver needs to check the existence of an NSEC RR
@@ -315,8 +316,8 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
 
         <t>As long as the validating resolver can determine that a name would
         not exist without the wildcard match, determined according to the
-        rules set out in <xref target="RFC4035">Section 5.3.4 of</xref> (NSEC),
-        or in <xref target="RFC5155">Section 8.8 of</xref>, it SHOULD
+        rules set out in <xref target="RFC4035">Section 5.3.4 of</xref>
+        (NSEC), or in <xref target="RFC5155">Section 8.8 of</xref>, it SHOULD
         synthesize an answer for that name using the cached deduced wildcard.
         If the corresponding wildcard record is not in the cache, it MUST fall
         back to send the query to the authoritative DNS servers.</t>
@@ -370,9 +371,9 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
 
       <t>The scale of the benefit depends upon multiple factors, including the
       query distribution. For example, at the time of this writing, around 65%
-      of queries to Root Name servers result in NXDOMAIN responses (see statis
-      <xref target="root-servers.org"/>); this technique will eliminate a
-      sizable quantity of these.</t>
+      of queries to Root Name servers result in NXDOMAIN responses (see
+      statistics from <xref target="root-servers.org"/>); this technique will
+      eliminate a sizable quantity of these.</t>
 
       <t>The technique described in this document may also mitigate so-called
       "random QNAME attacks", in which attackers send many queries for random
@@ -456,7 +457,9 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
       Tony Finch, Tatuya JINMEI for extensive review and comments, and also
       Mark Andrews, Casey Deccio, Alexander Dupuy, Olafur Gudmundsson, Bob
       Harold, Shumon Huque, John Levine, Pieter Lexis and Matthijs Mekking
-      (who even sent pull requests!).</t>
+      (who even sent pull requests!). Mark Andrews also provided the text
+      (https://www.ietf.org/mail-archive/web/dnsop/current/msg18332.html)
+      which we made into Appendix B</t>
 
       <section anchor="change-history" title="Change History">
         <t>RFC Editor: Please remove this section prior to publication.</t>
@@ -466,11 +469,17 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
             to 'example.com' I made the example wrong / confusing. I have
             attempted to fix this by adding a second example zone
             (example.org) with the wildcard instead.</t>
+
+            <t>More helpful changes (in a pull request, thanks!) from
+            Matthijs</t>
+
+            <t>Included Mark Andrew's useful explanation of how to tell ENT
+            from NXD as an Appendix.</t>
           </list></t>
 
         <t>-03 to -04:<list style="symbols">
             <t>Working group does want the "positive" answers, not just
-            negative ones. This requires readding what used to be Section 7,
+            negative ones. This requires reading what used to be Section 7,
             and a bunch of cleanup, including:<list style="symbols">
                 <t>Additional text in the Problem Statement</t>
 
@@ -986,6 +995,34 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
           query as usual" means that the resolver must process the query as
           though it does not implement aggressive negative caching.</t>
         </list></t>
+    </section>
+
+    <section title="Procedure for determining ENT vs NXDOMAN">
+      <t>Thanks to Mark Andrews for providing these helpful notes for
+      implementors. As they are more general than for Aggressive NSEC we have
+      placed them in an appendix.</t>
+
+      <t>If the NSEC record has not been verified as secure discard it. </t>
+
+      <t>If the given name sorts before or matches the NSEC owner name discard
+      it as it does not prove the NXDOMAIN or ENT. </t>
+
+      <t>If the given name is a subdomain of the NSEC owner name and the NS
+      bit is present and the SOA bit is absent then discard the NSEC as it is
+      from a parent zone. </t>
+
+      <t>If the next domain name sorts after the NSEC owner name and the given
+      name sorts after or matches next domain name then discard the NSEC
+      record as it does not prove the NXDOMAIN or ENT. </t>
+
+      <t>If the next domain name sorts before or matches the NSEC owner name
+      and the given name is not a subdomain of the next domain name then
+      discard the NSEC as it does not prove the NXDOMAIN or ENT. </t>
+
+      <t>You now have a NSEC record that proves the NXDOMAIN or ENT. </t>
+
+      <t>If the next domain name is a subdomain of the given name you have a
+      ENT otherwise you have a NXDOMAIN.</t>
     </section>
   </back>
 </rfc>
