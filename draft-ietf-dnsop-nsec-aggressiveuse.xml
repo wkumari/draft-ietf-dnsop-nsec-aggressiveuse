@@ -244,7 +244,7 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
       within a zone.</t>
     </section>
 
-    <section anchor="aggressive-negative-caching" title="Aggressive Caching">
+    <section anchor="aggressive-negative-caching" title="Aggressive Negative Caching">
       <t>Section 4.5 of <xref target="RFC4035"/> says that "In theory, a
       resolver could use wildcards or NSEC RRs to generate positive and
       negative responses (respectively) until the TTL or signatures on the
@@ -268,17 +268,18 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
 
       <t/>
 
-      <t>If the validating resolver's cache has sufficient information to
-      validate the query, the resolver SHOULD use NSEC/NSEC3/wildcard records
-      aggressively. Otherwise, it MUST fall back to send the query to the
-      authoritative DNS servers.</t>
+      <t>If the negative cache of the validating resolver has sufficient
+      information to validate the query, the resolver SHOULD use NSEC, NSEC3
+      and wildcard records aggressively. Otherwise, it MUST fall back to
+      send the query to the authoritative DNS servers.</t>
+
+      <t>It is recommended that resolvers that implement Aggressive
+      Negative Caching provide a configuration switch to disable the
+      feature. Separate configuration switches may be implemented for
+      the aggressive use of NSEC, NSEC3 and wildcard records, and
+      it is recommended to enable aggressive negative caching by default.</t>
 
       <section anchor="nsec" title="NSEC">
-        <t>Implementations which support aggressive use of NSEC SHOULD enable
-        this by default. Implementations MAY provide a configuration switch to
-        disable aggressive use of NSEC and allow it to be enabled or disabled
-        per domain.</t>
-
         <t>The validating resolver needs to check the existence of an NSEC RR
         matching/covering the source of synthesis and an NSEC RR covering the
         query name.</t>
@@ -295,14 +296,8 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
         resolver needs to check the existence of non-terminals and wildcards
         which derive from query names.</t>
 
-        <t>A validating resolver implementation MAY support aggressive use of
-        NSEC3. If it does support aggressive use of NSEC3, it SHOULD enable
-        this by default. It MAY provide a configuration switch to disable
-        aggressive use of NSEC3 and allow it to be enabled or disabled for
-        specific zones.</t>
-
         <t>If denial of existence can be determined according to the rules set
-        out in <xref target="RFC5155"/> sections 8.4, 8.5, 8.6, 8.7,using
+        out in <xref target="RFC5155"/> Sections 8.4, 8.5, 8.6, 8.7, using
         NSEC3 records in the cache, then the resolver can immediately return
         an NXDOMAIN or NODATA response (as appropriate).</t>
 
@@ -319,14 +314,12 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
         revise this recommendation.</t>
 
         <t>As long as the validating resolver can determine that a name would
-        not exist without the wildcard match, it MAY synthesize an answer for
-        that name using the cached deduced wildcard. If the corresponding
-        wildcard record is not in the cache, it MUST fall back to send the
-        query to the authoritative DNS servers.</t>
-
-        <t>An implementation MAY support aggressive use of wildcards. It
-        SHOULD provide a configuration switch to disable aggressive use of
-        wildcards.</t>
+        not exist without the wildcard match, determined according to the
+        rules set out in <xref target="RFC4035">Section 5.3.4 of</xref> (NSEC),
+        or in <xref target="RFC5155">Section 8.8 of</xref>, it SHOULD
+        synthesize an answer for that name using the cached deduced wildcard.
+        If the corresponding wildcard record is not in the cache, it MUST fall
+        back to send the query to the authoritative DNS servers.</t>
       </section>
 
       <section anchor="consideration-on-ttl" title="Consideration on TTL">
@@ -451,7 +444,7 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
       says: "Since this information is necessarily time dependent, it is
       inappropriate for inclusion in a published RFC." ]</t>
 
-      <t>Unbound currenty implements aggressive negative caching, as does
+      <t>Unbound currently implements aggressive negative caching, as does
       Google Public DNS.</t>
     </section>
 
