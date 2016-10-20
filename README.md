@@ -8,13 +8,13 @@ Network Working Group                                        K. Fujiwara
 Internet-Draft                                                      JPRS
 Updates: 4035 (if approved)                                      A. Kato
 Intended status: Standards Track                               Keio/WIDE
-Expires: April 10, 2017                                        W. Kumari
+Expires: April 23, 2017                                        W. Kumari
                                                                   Google
-                                                         October 7, 2016
+                                                        October 20, 2016
 
 
                       Aggressive use of NSEC/NSEC3
-                 draft-ietf-dnsop-nsec-aggressiveuse-04
+                 draft-ietf-dnsop-nsec-aggressiveuse-05
 
 Abstract
 
@@ -55,7 +55,7 @@ Status of This Memo
 
 
 
-Fujiwara, et al.         Expires April 10, 2017                 [Page 1]
+Fujiwara, et al.         Expires April 23, 2017                 [Page 1]
 
 Internet-Draft              NSEC/NSEC3 usage                October 2016
 
@@ -63,7 +63,7 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on April 10, 2017.
+   This Internet-Draft will expire on April 23, 2017.
 
 Copyright Notice
 
@@ -111,7 +111,7 @@ Table of Contents
 
 
 
-Fujiwara, et al.         Expires April 10, 2017                 [Page 2]
+Fujiwara, et al.         Expires April 23, 2017                 [Page 2]
 
 Internet-Draft              NSEC/NSEC3 usage                October 2016
 
@@ -167,7 +167,7 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
 
 
 
-Fujiwara, et al.         Expires April 10, 2017                 [Page 3]
+Fujiwara, et al.         Expires April 23, 2017                 [Page 3]
 
 Internet-Draft              NSEC/NSEC3 usage                October 2016
 
@@ -223,7 +223,7 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
 
 
 
-Fujiwara, et al.         Expires April 10, 2017                 [Page 4]
+Fujiwara, et al.         Expires April 23, 2017                 [Page 4]
 
 Internet-Draft              NSEC/NSEC3 usage                October 2016
 
@@ -279,7 +279,7 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
 
 
 
-Fujiwara, et al.         Expires April 10, 2017                 [Page 5]
+Fujiwara, et al.         Expires April 23, 2017                 [Page 5]
 
 Internet-Draft              NSEC/NSEC3 usage                October 2016
 
@@ -335,7 +335,7 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
 
 
 
-Fujiwara, et al.         Expires April 10, 2017                 [Page 6]
+Fujiwara, et al.         Expires April 23, 2017                 [Page 6]
 
 Internet-Draft              NSEC/NSEC3 usage                October 2016
 
@@ -391,7 +391,7 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
 
 
 
-Fujiwara, et al.         Expires April 10, 2017                 [Page 7]
+Fujiwara, et al.         Expires April 23, 2017                 [Page 7]
 
 Internet-Draft              NSEC/NSEC3 usage                October 2016
 
@@ -447,7 +447,7 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
 
 
 
-Fujiwara, et al.         Expires April 10, 2017                 [Page 8]
+Fujiwara, et al.         Expires April 23, 2017                 [Page 8]
 
 Internet-Draft              NSEC/NSEC3 usage                October 2016
 
@@ -503,7 +503,7 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
 
 
 
-Fujiwara, et al.         Expires April 10, 2017                 [Page 9]
+Fujiwara, et al.         Expires April 23, 2017                 [Page 9]
 
 Internet-Draft              NSEC/NSEC3 usage                October 2016
 
@@ -559,7 +559,7 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
 
 
 
-Fujiwara, et al.         Expires April 10, 2017                [Page 10]
+Fujiwara, et al.         Expires April 23, 2017                [Page 10]
 
 Internet-Draft              NSEC/NSEC3 usage                October 2016
 
@@ -615,7 +615,7 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
 
 
 
-Fujiwara, et al.         Expires April 10, 2017                [Page 11]
+Fujiwara, et al.         Expires April 23, 2017                [Page 11]
 
 Internet-Draft              NSEC/NSEC3 usage                October 2016
 
@@ -671,7 +671,7 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
 
 
 
-Fujiwara, et al.         Expires April 10, 2017                [Page 12]
+Fujiwara, et al.         Expires April 23, 2017                [Page 12]
 
 Internet-Draft              NSEC/NSEC3 usage                October 2016
 
@@ -727,7 +727,7 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
 
 
 
-Fujiwara, et al.         Expires April 10, 2017                [Page 13]
+Fujiwara, et al.         Expires April 23, 2017                [Page 13]
 
 Internet-Draft              NSEC/NSEC3 usage                October 2016
 
@@ -783,7 +783,7 @@ Appendix A.  Detailed implementation notes
 
 
 
-Fujiwara, et al.         Expires April 10, 2017                [Page 14]
+Fujiwara, et al.         Expires April 23, 2017                [Page 14]
 
 Internet-Draft              NSEC/NSEC3 usage                October 2016
 
@@ -839,7 +839,7 @@ Appendix B.  Procedure for determining ENT vs NXDOMAN
 
 
 
-Fujiwara, et al.         Expires April 10, 2017                [Page 15]
+Fujiwara, et al.         Expires April 23, 2017                [Page 15]
 
 Internet-Draft              NSEC/NSEC3 usage                October 2016
 
@@ -895,5 +895,5 @@ Authors' Addresses
 
 
 
-Fujiwara, et al.         Expires April 10, 2017                [Page 16]
+Fujiwara, et al.         Expires April 23, 2017                [Page 16]
 ```
