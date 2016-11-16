@@ -6,7 +6,7 @@
 <?rfc tocdepth="4"?>
 <?rfc sortrefs="yes"?>
 <?rfc symrefs="yes"?>
-<rfc category="std" docName="draft-ietf-dnsop-nsec-aggressiveuse-05"
+<rfc category="std" docName="draft-ietf-dnsop-nsec-aggressiveuse-06"
      ipr="trust200902" updates="4035">
   <front>
     <title abbrev="NSEC/NSEC3 usage">Aggressive use of NSEC/NSEC3</title>
@@ -73,7 +73,7 @@
       </address>
     </author>
 
-    <date day="20" month="October" year="2016"/>
+    <date day="16" month="November" year="2016"/>
 
     <area>operations</area>
 
@@ -123,10 +123,9 @@
       Lookaside Validation (DLV) <xref target="RFC5074"/> in order to find
       covering NSEC records efficiently.</t>
 
-      <t>Section 3 of <xref target="I-D.vixie-dnsext-resimprove"/> "Stopping
-      Downward Cache Search on NXDOMAIN" and <xref
-      target="I-D.ietf-dnsop-nxdomain-cut"/> proposed another approach to use
-      NXDOMAIN information effectively.</t>
+      <t> <xref target="RFC8020"/> proposes a first step to using NXDOMAIN
+      information for more effective caching. This takes this technique
+      further.</t>
     </section>
 
     <section anchor="terminology" title="Terminology">
@@ -195,7 +194,7 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
       leek.example.org, with the label count of the signature set to two (see
       <xref target="RFC7129"/>, section 5.3 for more details).</t>
 
-      <t>If the validating resolver gets a query for banana.example.com it
+      <t>If the validating resolver gets a query for banana.example.org it
       will once again go off and query the example.com servers for
       banana.example.com (even though it already has proof that there is a
       wildcard record) - just like above, this has privacy implications,
@@ -251,29 +250,15 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
     </section>
 
     <section anchor="aggressive-negative-caching"
-             title="Aggressive Negative Caching">
+             title="Aggressive use of Cache">
       <t>Section 4.5 of <xref target="RFC4035"/> says that "In theory, a
       resolver could use wildcards or NSEC RRs to generate positive and
       negative responses (respectively) until the TTL or signatures on the
       records in question expire. However, it seems prudent for resolvers to
       avoid blocking new authoritative data or synthesizing new data on their
       own. Resolvers that follow this recommendation will have a more
-      consistent view of the namespace".</t>
-
-      <t>This document relaxes this this restriction, as follows:</t>
-
-      <figure>
-        <artwork><![CDATA[
-+--------------------------------------------------------------+
-|  Once the records are validated, DNSSEC enabled validating   |
-|  resolvers MAY use wildcards and NSEC/NSEC3 resource records |
-|  to generate positive and negative responses until the       |
-|  effective TTLs or signatures for those records expire.      |
-+--------------------------------------------------------------+
-]]></artwork>
-      </figure>
-
-      <t/>
+      consistent view of the namespace". This document relaxes this this
+      restriction, see Section 7 for more detail.</t>
 
       <t>If the negative cache of the validating resolver has sufficient
       information to validate the query, the resolver SHOULD use NSEC, NSEC3
@@ -347,8 +332,8 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
         3.)</t>
 
         <t>A resolver that supports aggressive use of NSEC and NSEC3 should
-        reduce the TTL of NSEC and NSEC3 records to match the TTL of the SOA
-        record in the authority section of a negative response, if the SOA TTL
+        reduce the TTL of NSEC and NSEC3 records to match the SOA.MINIMUM
+        field in the authority section of a negative response, if SOA.MINIMUM
         is smaller.</t>
       </section>
     </section>
@@ -361,18 +346,18 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
           they are looking for does not exist, improving the user
           experience.</t>
 
-          <t hangText="Decreased recursive server load:">By answering negative
-          queries from the cache, validating servers avoid having to send a
-          query and wait for a response. In addition to decreasing the
-          bandwidth used, it also means that the server does not need to
-          allocate and maintain state, thereby decreasing memory and CPU
-          load.</t>
+          <t hangText="Decreased recursive server load:">By answering queries
+          from the cache by synthesizing answers, validating servers avoid
+          having to send a query and wait for a response. In addition to
+          decreasing the bandwidth used, it also means that the server does
+          not need to allocate and maintain state, thereby decreasing memory
+          and CPU load.</t>
 
           <t hangText="Decreased authorative server load:">Because recursive
-          servers can answer (negative) queries without asking the
-          authoritative server, the authoritative servers receive fewer
-          queries. This decreases the authoritative server bandwidth, queries
-          per second and CPU utilization.</t>
+          servers can answer queries without asking the authoritative server,
+          the authoritative servers receive fewer queries. This decreases the
+          authoritative server bandwidth, queries per second and CPU
+          utilization.</t>
         </list></t>
 
       <t>The scale of the benefit depends upon multiple factors, including the
@@ -459,16 +444,27 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
       <t>The authors gratefully acknowledge DLV <xref target="RFC5074"/>
       author Samuel Weiler and the Unbound developers.</t>
 
-      <t>The authors would like to specifically thank Stephane Bortzmeyer,
-      Tony Finch, Tatuya JINMEI for extensive review and comments, and also
-      Mark Andrews, Casey Deccio, Alexander Dupuy, Olafur Gudmundsson, Bob
-      Harold, Shumon Huque, John Levine, Pieter Lexis and Matthijs Mekking
-      (who even sent pull requests!). Mark Andrews also provided the text
+      <t>The authors would like to specifically thank Stephane Bortzmeyer (for
+      standing next to and helping edit), Tony Finch, Tatuya JINMEI for
+      extensive review and comments, and also Mark Andrews, Casey Deccio,
+      Alexander Dupuy, Olafur Gudmundsson, Bob Harold, Shumon Huque, John
+      Levine, Pieter Lexis and Matthijs Mekking (who even sent pull
+      requests!). Mark Andrews also provided the text
       (https://www.ietf.org/mail-archive/web/dnsop/current/msg18332.html)
-      which we made into Appendix B</t>
+      which we made into Appendix B.</t>
 
       <section anchor="change-history" title="Change History">
         <t>RFC Editor: Please remove this section prior to publication.</t>
+
+        <t>-05 to -06:<list style="symbols">
+            <t>Moved some dangling text around - when the examples were added
+            some text added in the wrong place.</t>
+
+            <t>There were some bits which mentioned "negative" in the
+            title.</t>
+
+            <t>We had the cut-and-paste of what changed in 4035 twice.</t>
+          </list></t>
 
         <t>-04 to -05:<list style="symbols">
             <t>Bob pointed out that I did a stupid - when I added the wildcard
@@ -503,7 +499,7 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
 
             <t>More fixups from Tony (including text):
             https://www.ietf.org/mail-archive/web/dnsop/current/msg18271.html.
-            This included much clearer text on TTL, refernces to the NSEC /
+            This included much clearer text on TTL, references to the NSEC /
             NSEC3 RFCs (instead of my clumsy summary), good text on replays,
             etc.</t>
 
@@ -918,6 +914,8 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
         <format target="http://www.ietf.org/internet-drafts/draft-vixie-dnsext-resimprove-00.txt"
                 type="TXT"/>
       </reference>
+
+      <?rfc include='reference.RFC.8020'?>
 
       <reference anchor="I-D.ietf-dnsop-nxdomain-cut">
         <front>
