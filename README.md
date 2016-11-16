@@ -85,20 +85,20 @@ Table of Contents
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
    2.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   3
    3.  Problem Statement . . . . . . . . . . . . . . . . . . . . . .   3
-   4.  Background  . . . . . . . . . . . . . . . . . . . . . . . . .   4
-   5.  Aggressive Negative Caching . . . . . . . . . . . . . . . . .   5
+   4.  Background  . . . . . . . . . . . . . . . . . . . . . . . . .   5
+   5.  Aggressive Negative Caching . . . . . . . . . . . . . . . . .   6
      5.1.  NSEC  . . . . . . . . . . . . . . . . . . . . . . . . . .   6
      5.2.  NSEC3 . . . . . . . . . . . . . . . . . . . . . . . . . .   6
      5.3.  Wildcards . . . . . . . . . . . . . . . . . . . . . . . .   7
      5.4.  Consideration on TTL  . . . . . . . . . . . . . . . . . .   7
-   6.  Benefits  . . . . . . . . . . . . . . . . . . . . . . . . . .   7
+   6.  Benefits  . . . . . . . . . . . . . . . . . . . . . . . . . .   8
    7.  Update to RFC 4035  . . . . . . . . . . . . . . . . . . . . .   8
    8.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   9
    9.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
    10. Implementation Status . . . . . . . . . . . . . . . . . . . .   9
-   11. Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .   9
+   11. Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .  10
      11.1.  Change History . . . . . . . . . . . . . . . . . . . . .  10
-       11.1.1.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-01 .  12
+       11.1.1.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-01 .  13
        11.1.2.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-02 .  13
        11.1.3.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-03 .  13
      11.2.  new section  . . . . . . . . . . . . . . . . . . . . . .  13
@@ -188,6 +188,14 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
    ball.example.com (or dog.example.com) it will once again go off and
    query the example.com servers for these names.
 
+   Apart from wasting bandwidth, this also wastes resources on the
+   recursive server (it needs to keep state for outstanding queries),
+   wastes resources on the authoritative server (it has to answer
+   additional questions), increases latency (the end user has to wait
+   longer than necessary to get back an NXDOMAIN answer), can be used by
+   attackers to cause a DoS (see additional resources), and also has
+   privacy implications (e.g: typos leak out further than necessary).
+
    Now, assume that the (DNSSEC signed) "example.org" zone contains:
 
    avocado.example.org   IN A 192.0.2.1
@@ -202,13 +210,23 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
    answer for leek.example.org, with the label count of the signature
    set to two (see [RFC7129], section 5.3 for more details).
 
-   Apart from wasting bandwidth, this also wastes resources on the
-   recursive server (it needs to keep state for outstanding queries),
-   wastes resources on the authoritative server (it has to answer
-   additional questions), increases latency (the end user has to wait
-   longer than necessary to get back an NXDOMAIN answer), can be used by
-   attackers to cause a DoS (see additional resources), and also has
-   privacy implications (e.g: typos leak out further than necessary).
+   If the validating resolver gets a query for banana.example.com it
+   will once again go off and query the example.com servers for
+   banana.example.com (even though it already has proof that there is a
+   wildcard record) - just like above, this has privacy implications,
+   wastes resources, can be used to contribute to a DoS, etc.
+
+
+
+
+
+
+
+
+Fujiwara, et al.         Expires April 23, 2017                 [Page 4]
+
+Internet-Draft              NSEC/NSEC3 usage                October 2016
+
 
 4.  Background
 
@@ -220,14 +238,6 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
    validating) recursive server were to query for dog.example.com it
    would receive a (signed) NSEC record stating that there are no labels
    between "albatross" and "elephant" (or, for NSEC3, a similar pair of
-
-
-
-Fujiwara, et al.         Expires April 23, 2017                 [Page 4]
-
-Internet-Draft              NSEC/NSEC3 usage                October 2016
-
-
    hashed names).  This is a signed, cryptographic proof that these
    names are the ones before and after the queried for label.  As
    dog.example.com falls within this range, the recursive server knows
@@ -267,6 +277,13 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
    record is the authoritative statement of how quickly a name can start
    working within a zone.
 
+
+
+Fujiwara, et al.         Expires April 23, 2017                 [Page 5]
+
+Internet-Draft              NSEC/NSEC3 usage                October 2016
+
+
 5.  Aggressive Negative Caching
 
    Section 4.5 of [RFC4035] says that "In theory, a resolver could use
@@ -276,13 +293,6 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
    new authoritative data or synthesizing new data on their own.
    Resolvers that follow this recommendation will have a more consistent
    view of the namespace".
-
-
-
-Fujiwara, et al.         Expires April 23, 2017                 [Page 5]
-
-Internet-Draft              NSEC/NSEC3 usage                October 2016
-
 
    This document relaxes this this restriction, as follows:
 
@@ -322,6 +332,14 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
    resolver needs to check the existence of non-terminals and wildcards
    which derive from query names.
 
+
+
+
+Fujiwara, et al.         Expires April 23, 2017                 [Page 6]
+
+Internet-Draft              NSEC/NSEC3 usage                October 2016
+
+
    If denial of existence can be determined according to the rules set
    out in [RFC5155] Sections 8.4, 8.5, 8.6, 8.7, using NSEC3 records in
    the cache, then the resolver can immediately return an NXDOMAIN or
@@ -330,15 +348,6 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
    If a covering NSEC3 RR has Opt-Out flag, the covering NSEC3 RR does
    not prove the non-existence of the domain name and the aggressive
    negative caching is not possible for the domain name.
-
-
-
-
-
-Fujiwara, et al.         Expires April 23, 2017                 [Page 6]
-
-Internet-Draft              NSEC/NSEC3 usage                October 2016
-
 
 5.3.  Wildcards
 
@@ -378,15 +387,6 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
    record in the authority section of a negative response, if the SOA
    TTL is smaller.
 
-6.  Benefits
-
-   The techniques described in this document provide a number of
-   benefits, including (in no specific order):
-
-   Reduced latency:  By answering directly from cache, validating
-      resolvers can immediately inform clients that the name they are
-      looking for does not exist, improving the user experience.
-
 
 
 
@@ -395,6 +395,15 @@ Fujiwara, et al.         Expires April 23, 2017                 [Page 7]
 
 Internet-Draft              NSEC/NSEC3 usage                October 2016
 
+
+6.  Benefits
+
+   The techniques described in this document provide a number of
+   benefits, including (in no specific order):
+
+   Reduced latency:  By answering directly from cache, validating
+      resolvers can immediately inform clients that the name they are
+      looking for does not exist, improving the user experience.
 
    Decreased recursive server load:  By answering negative queries from
       the cache, validating servers avoid having to send a query and
@@ -435,6 +444,14 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
    Resolvers that follow this recommendation will have a more consistent
    view of the namespace".
 
+
+
+
+Fujiwara, et al.         Expires April 23, 2017                 [Page 8]
+
+Internet-Draft              NSEC/NSEC3 usage                October 2016
+
+
    The paragraph is updated as follows:
 
    +--------------------------------------------------------------+
@@ -443,14 +460,6 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
    |  to generate positive and negative responses until the       |
    |  effective TTLs or signatures for those records expire.      |
    +--------------------------------------------------------------+
-
-
-
-
-Fujiwara, et al.         Expires April 23, 2017                 [Page 8]
-
-Internet-Draft              NSEC/NSEC3 usage                October 2016
-
 
 8.  IANA Considerations
 
@@ -491,6 +500,14 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
    Unbound currently implements aggressive negative caching, as does
    Google Public DNS.
 
+
+
+
+Fujiwara, et al.         Expires April 23, 2017                 [Page 9]
+
+Internet-Draft              NSEC/NSEC3 usage                October 2016
+
+
 11.  Acknowledgments
 
    The authors gratefully acknowledge DLV [RFC5074] author Samuel Weiler
@@ -500,14 +517,6 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
    Tony Finch, Tatuya JINMEI for extensive review and comments, and also
    Mark Andrews, Casey Deccio, Alexander Dupuy, Olafur Gudmundsson, Bob
    Harold, Shumon Huque, John Levine, Pieter Lexis and Matthijs Mekking
-
-
-
-Fujiwara, et al.         Expires April 23, 2017                 [Page 9]
-
-Internet-Draft              NSEC/NSEC3 usage                October 2016
-
-
    (who even sent pull requests!).  Mark Andrews also provided the text
    (https://www.ietf.org/mail-archive/web/dnsop/current/msg18332.html)
    which we made into Appendix B
@@ -548,21 +557,19 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
       https://github.com/wkumari/draft-ietf-dnsop-nsec-aggressiveuse/
       pull/1
 
-   o  More fixups from Tony (including text): https://www.ietf.org/mail-
-      archive/web/dnsop/current/msg18271.html.  This included much
-      clearer text on TTL, refernces to the NSEC / NSEC3 RFCs (instead
-      of my clumsy summary), good text on replays, etc.
-
-   o  Converted the "zone file" to a figure to make it more readable.
-
-
-
 
 
 Fujiwara, et al.         Expires April 23, 2017                [Page 10]
 
 Internet-Draft              NSEC/NSEC3 usage                October 2016
 
+
+   o  More fixups from Tony (including text): https://www.ietf.org/mail-
+      archive/web/dnsop/current/msg18271.html.  This included much
+      clearer text on TTL, refernces to the NSEC / NSEC3 RFCs (instead
+      of my clumsy summary), good text on replays, etc.
+
+   o  Converted the "zone file" to a figure to make it more readable.
 
    o  Text from Tim W: "If a validating resolver receives a query for
       cat.example.com, it contacts its resolver (which may be itself) to
@@ -604,13 +611,6 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
    o  Integrated other comments from Jinmei from https://www.ietf.org/
       mail-archive/web/dnsop/current/msg17875.html
 
-   o  Integrated comment from co-authors, including re-adding parts of
-      Appendix B, terminology, typos.
-
-   o  Tried to explain under what conditions this may actually mitigate
-      attacks.
-
-   -00 to -01:
 
 
 
@@ -619,6 +619,14 @@ Fujiwara, et al.         Expires April 23, 2017                [Page 11]
 
 Internet-Draft              NSEC/NSEC3 usage                October 2016
 
+
+   o  Integrated comment from co-authors, including re-adding parts of
+      Appendix B, terminology, typos.
+
+   o  Tried to explain under what conditions this may actually mitigate
+      attacks.
+
+   -00 to -01:
 
    o  Comments from DNSOP meeting in Berlin.
 
@@ -656,14 +664,6 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
 
    o  Reworked examples to better explain the problem / solution.
 
-11.1.1.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-01
-
-   o  Added reference to DLV [RFC5074] and imported some sentences.
-
-   o  Added Aggressive Negative Caching Flag idea.
-
-   o  Added detailed algorithms.
-
 
 
 
@@ -675,6 +675,14 @@ Fujiwara, et al.         Expires April 23, 2017                [Page 12]
 
 Internet-Draft              NSEC/NSEC3 usage                October 2016
 
+
+11.1.1.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-01
+
+   o  Added reference to DLV [RFC5074] and imported some sentences.
+
+   o  Added Aggressive Negative Caching Flag idea.
+
+   o  Added detailed algorithms.
 
 11.1.2.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-02
 
@@ -714,14 +722,6 @@ Internet-Draft              NSEC/NSEC3 usage                October 2016
               NCACHE)", RFC 2308, DOI 10.17487/RFC2308, March 1998,
               <http://www.rfc-editor.org/info/rfc2308>.
 
-   [RFC4035]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
-              Rose, "Protocol Modifications for the DNS Security
-              Extensions", RFC 4035, DOI 10.17487/RFC4035, March 2005,
-              <http://www.rfc-editor.org/info/rfc4035>.
-
-   [RFC4592]  Lewis, E., "The Role of Wildcards in the Domain Name
-              System", RFC 4592, DOI 10.17487/RFC4592, July 2006,
-              <http://www.rfc-editor.org/info/rfc4592>.
 
 
 
@@ -731,6 +731,15 @@ Fujiwara, et al.         Expires April 23, 2017                [Page 13]
 
 Internet-Draft              NSEC/NSEC3 usage                October 2016
 
+
+   [RFC4035]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
+              Rose, "Protocol Modifications for the DNS Security
+              Extensions", RFC 4035, DOI 10.17487/RFC4035, March 2005,
+              <http://www.rfc-editor.org/info/rfc4035>.
+
+   [RFC4592]  Lewis, E., "The Role of Wildcards in the Domain Name
+              System", RFC 4592, DOI 10.17487/RFC4592, July 2006,
+              <http://www.rfc-editor.org/info/rfc4592>.
 
    [RFC5074]  Weiler, S., "DNSSEC Lookaside Validation (DLV)", RFC 5074,
               DOI 10.17487/RFC5074, November 2007,
@@ -771,15 +780,6 @@ Appendix A.  Detailed implementation notes
    o  Previously, cached negative responses were indexed by QNAME,
       QCLASS, QTYPE, and the setting of the CD bit (see RFC 4035,
       Section 4.7), and only queries matching the index key would be
-      answered from the cache.  With aggressive negative caching, the
-      validator, in addition to checking to see if the answer is in its
-      cache before sending a query, checks to see whether any cached and
-      validated NSEC record denies the existence of the sought
-      record(s).  Using aggressive negative caching, a validator will
-      not make queries for any name covered by a cached and validated
-      NSEC record.  Furthermore, a validator answering queries from
-      clients will synthesize a negative answer whenever it has an
-
 
 
 
@@ -788,6 +788,14 @@ Fujiwara, et al.         Expires April 23, 2017                [Page 14]
 Internet-Draft              NSEC/NSEC3 usage                October 2016
 
 
+      answered from the cache.  With aggressive negative caching, the
+      validator, in addition to checking to see if the answer is in its
+      cache before sending a query, checks to see whether any cached and
+      validated NSEC record denies the existence of the sought
+      record(s).  Using aggressive negative caching, a validator will
+      not make queries for any name covered by a cached and validated
+      NSEC record.  Furthermore, a validator answering queries from
+      clients will synthesize a negative answer whenever it has an
       applicable validated NSEC in its cache unless the CD bit was set
       on the incoming query.  (Imported from Section 6 of [RFC5074]).
 
@@ -829,20 +837,17 @@ Appendix B.  Procedure for determining ENT vs NXDOMAN
    and the given name is not a subdomain of the next domain name then
    discard the NSEC as it does not prove the NXDOMAIN or ENT.
 
-   You now have a NSEC record that proves the NXDOMAIN or ENT.
-
-   If the next domain name is a subdomain of the given name you have a
-   ENT otherwise you have a NXDOMAIN.
-
-
-
-
 
 
 Fujiwara, et al.         Expires April 23, 2017                [Page 15]
 
 Internet-Draft              NSEC/NSEC3 usage                October 2016
 
+
+   You now have a NSEC record that proves the NXDOMAIN or ENT.
+
+   If the next domain name is a subdomain of the given name you have a
+   ENT otherwise you have a NXDOMAIN.
 
 Authors' Addresses
 
@@ -873,11 +878,6 @@ Authors' Addresses
    US
 
    Email: warren@kumari.net
-
-
-
-
-
 
 
 

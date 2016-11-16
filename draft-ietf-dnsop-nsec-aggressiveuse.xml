@@ -171,6 +171,14 @@ zebra.example.com     IN A 192.0.2.3]]></artwork>
       (or dog.example.com) it will once again go off and query the example.com
       servers for these names.</t>
 
+      <t>Apart from wasting bandwidth, this also wastes resources on the
+      recursive server (it needs to keep state for outstanding queries),
+      wastes resources on the authoritative server (it has to answer
+      additional questions), increases latency (the end user has to wait
+      longer than necessary to get back an NXDOMAIN answer), can be used by
+      attackers to cause a DoS (see additional resources), and also has
+      privacy implications (e.g: typos leak out further than necessary).</t>
+
       <t>Now, assume that the (DNSSEC signed) "example.org" zone contains:</t>
 
       <t><figure>
@@ -187,13 +195,11 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
       leek.example.org, with the label count of the signature set to two (see
       <xref target="RFC7129"/>, section 5.3 for more details).</t>
 
-      <t>Apart from wasting bandwidth, this also wastes resources on the
-      recursive server (it needs to keep state for outstanding queries),
-      wastes resources on the authoritative server (it has to answer
-      additional questions), increases latency (the end user has to wait
-      longer than necessary to get back an NXDOMAIN answer), can be used by
-      attackers to cause a DoS (see additional resources), and also has
-      privacy implications (e.g: typos leak out further than necessary).</t>
+      <t>If the validating resolver gets a query for banana.example.com it
+      will once again go off and query the example.com servers for
+      banana.example.com (even though it already has proof that there is a
+      wildcard record) - just like above, this has privacy implications,
+      wastes resources, can be used to contribute to a DoS, etc.</t>
     </section>
 
     <section title="Background">
@@ -1002,24 +1008,24 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
       implementors. As they are more general than for Aggressive NSEC we have
       placed them in an appendix.</t>
 
-      <t>If the NSEC record has not been verified as secure discard it. </t>
+      <t>If the NSEC record has not been verified as secure discard it.</t>
 
       <t>If the given name sorts before or matches the NSEC owner name discard
-      it as it does not prove the NXDOMAIN or ENT. </t>
+      it as it does not prove the NXDOMAIN or ENT.</t>
 
       <t>If the given name is a subdomain of the NSEC owner name and the NS
       bit is present and the SOA bit is absent then discard the NSEC as it is
-      from a parent zone. </t>
+      from a parent zone.</t>
 
       <t>If the next domain name sorts after the NSEC owner name and the given
       name sorts after or matches next domain name then discard the NSEC
-      record as it does not prove the NXDOMAIN or ENT. </t>
+      record as it does not prove the NXDOMAIN or ENT.</t>
 
       <t>If the next domain name sorts before or matches the NSEC owner name
       and the given name is not a subdomain of the next domain name then
-      discard the NSEC as it does not prove the NXDOMAIN or ENT. </t>
+      discard the NSEC as it does not prove the NXDOMAIN or ENT.</t>
 
-      <t>You now have a NSEC record that proves the NXDOMAIN or ENT. </t>
+      <t>You now have a NSEC record that proves the NXDOMAIN or ENT.</t>
 
       <t>If the next domain name is a subdomain of the given name you have a
       ENT otherwise you have a NXDOMAIN.</t>
