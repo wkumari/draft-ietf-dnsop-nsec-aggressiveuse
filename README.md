@@ -89,7 +89,7 @@ Table of Contents
    5.  Aggressive use of Cache . . . . . . . . . . . . . . . . . . .   6
      5.1.  NSEC  . . . . . . . . . . . . . . . . . . . . . . . . . .   6
      5.2.  NSEC3 . . . . . . . . . . . . . . . . . . . . . . . . . .   6
-     5.3.  Wildcards . . . . . . . . . . . . . . . . . . . . . . . .   7
+     5.3.  Wildcards . . . . . . . . . . . . . . . . . . . . . . . .   6
      5.4.  Consideration on TTL  . . . . . . . . . . . . . . . . . .   7
    6.  Benefits  . . . . . . . . . . . . . . . . . . . . . . . . . .   7
    7.  Update to RFC 4035  . . . . . . . . . . . . . . . . . . . . .   8
@@ -300,12 +300,6 @@ Internet-Draft              NSEC/NSEC3 usage               November 2016
    NSEC3 and wildcard records aggressively.  Otherwise, it MUST fall
    back to send the query to the authoritative DNS servers.
 
-   It is recommended that resolvers that implement Aggressive Negative
-   Caching provide a configuration switch to disable the feature.
-   Separate configuration switches may be implemented for the aggressive
-   use of NSEC, NSEC3 and wildcard records, and it is recommended to
-   enable aggressive negative caching by default.
-
 5.1.  NSEC
 
    The validating resolver needs to check the existence of an NSEC RR
@@ -333,6 +327,12 @@ Internet-Draft              NSEC/NSEC3 usage               November 2016
    not prove the non-existence of the domain name and the aggressive
    negative caching is not possible for the domain name.
 
+5.3.  Wildcards
+
+   The last paragraph of [RFC4035] Section 4.5 also discusses the use of
+   wildcards and NSEC RRs to generate positive responses and recommends
+   that it not be relied upon.  Just like the case for the aggressive
+
 
 
 Fujiwara, et al.          Expires May 20, 2017                  [Page 6]
@@ -340,11 +340,6 @@ Fujiwara, et al.          Expires May 20, 2017                  [Page 6]
 Internet-Draft              NSEC/NSEC3 usage               November 2016
 
 
-5.3.  Wildcards
-
-   The last paragraph of [RFC4035] Section 4.5 also discusses the use of
-   wildcards and NSEC RRs to generate positive responses and recommends
-   that it not be relied upon.  Just like the case for the aggressive
    use of NSEC/NSEC3 for negative answers, we revise this
    recommendation.
 
@@ -367,13 +362,13 @@ Internet-Draft              NSEC/NSEC3 usage               November 2016
    validating resolvers limit the maximum effective TTL value of
    negative responses (NSEC/NSEC3 RRs) to this same value.
 
-   Section 5 of [RFC2308]also states that a negative cache entry TTL is
+   Section 5 of [RFC2308] also states that a negative cache entry TTL is
    taken from the minimum of the SOA.MINIMUM field and SOA's TTL.  This
    can be less than the TTL of an NSEC or NSEC3 record, since their TTL
    is equal to the SOA.MINIMUM field (see [RFC4035]section 2.3 and
    [RFC5155] section 3.)
 
-   A resolver that supports aggressive use of NSEC and NSEC3 should
+   A resolver that supports aggressive use of NSEC and NSEC3 SHOULD
    reduce the TTL of NSEC and NSEC3 records to match the SOA.MINIMUM
    field in the authority section of a negative response, if SOA.MINIMUM
    is smaller.
@@ -387,7 +382,12 @@ Internet-Draft              NSEC/NSEC3 usage               November 2016
       resolvers can immediately inform clients that the name they are
       looking for does not exist, improving the user experience.
 
-
+   Decreased recursive server load:  By answering queries from the cache
+      by synthesizing answers, validating servers avoid having to send a
+      query and wait for a response.  In addition to decreasing the
+      bandwidth used, it also means that the server does not need to
+      allocate and maintain state, thereby decreasing memory and CPU
+      load.
 
 
 
@@ -395,13 +395,6 @@ Fujiwara, et al.          Expires May 20, 2017                  [Page 7]
 
 Internet-Draft              NSEC/NSEC3 usage               November 2016
 
-
-   Decreased recursive server load:  By answering queries from the cache
-      by synthesizing answers, validating servers avoid having to send a
-      query and wait for a response.  In addition to decreasing the
-      bandwidth used, it also means that the server does not need to
-      allocate and maintain state, thereby decreasing memory and CPU
-      load.
 
    Decreased authoritative server load:  Because recursive servers can
       answer queries without asking the authoritative server, the
@@ -426,6 +419,9 @@ Internet-Draft              NSEC/NSEC3 usage               November 2016
    effective defense, not least because not many zones are DNSSEC signed
    at all -- but it will still provide an additional layer of defense.
 
+   As these benefits are only accrued by those using DNSSEC, it is hoped
+   that these techniques will lead to more DNSSEC deployment.
+
 7.  Update to RFC 4035
 
    Section 4.5 of [RFC4035] shows that "In theory, a resolver could use
@@ -444,6 +440,10 @@ Internet-Draft              NSEC/NSEC3 usage               November 2016
    |  to generate positive and negative responses until the          |
    |  effective TTLs or signatures for those records expire.         |
    +-----------------------------------------------------------------+
+
+
+
+
 
 
 
@@ -497,9 +497,9 @@ Internet-Draft              NSEC/NSEC3 usage               November 2016
    and the Unbound developers.
 
    The authors would like to specifically thank Stephane Bortzmeyer (for
-   standing next to and helping edit), Tony Finch, Tatuya JINMEI for
-   extensive review and comments, and also Mark Andrews, Casey Deccio,
-   Alexander Dupuy, Olafur Gudmundsson, Bob Harold, Shumon Huque, John
+   standing next to and helping edit), Ralph Dolmans, Tony Finch, Tatuya
+   JINMEI for extensive review and comments, and also Mark Andrews,
+   Casey Deccio, Alexander Dupuy, Olafur Gudmundsson, Bob Harold, Shumon
 
 
 
@@ -508,8 +508,8 @@ Fujiwara, et al.          Expires May 20, 2017                  [Page 9]
 Internet-Draft              NSEC/NSEC3 usage               November 2016
 
 
-   Levine, Pieter Lexis and Matthijs Mekking (who even sent pull
-   requests!).  Mark Andrews also provided the text
+   Huque, John Levine, Pieter Lexis, Matthijs Mekking (who even sent
+   pull requests!) and Ondrej Sury.  Mark Andrews also provided the text
    (https://www.ietf.org/mail-archive/web/dnsop/current/msg18332.html)
    which we made into Appendix B.
 
@@ -817,7 +817,9 @@ Appendix B.  Procedure for determining ENT vs NXDOMAN
 
    Thanks to Mark Andrews for providing these helpful notes for
    implementors.  As they are more general than for Aggressive NSEC we
-   have placed them in an appendix.
+   have placed them in an appendix.  This procedure outlines how to
+   determine if a given name does not exist, or is an ENT (Empty Non-
+   Terminal, see [RFC5155] Section 1.3)
 
    If the NSEC record has not been verified as secure discard it.
 
@@ -832,9 +834,7 @@ Appendix B.  Procedure for determining ENT vs NXDOMAN
    name sorts after or matches next domain name then discard the NSEC
    record as it does not prove the NXDOMAIN or ENT.
 
-   If the next domain name sorts before or matches the NSEC owner name
-   and the given name is not a subdomain of the next domain name then
-   discard the NSEC as it does not prove the NXDOMAIN or ENT.
+
 
 
 
@@ -843,6 +843,10 @@ Fujiwara, et al.          Expires May 20, 2017                 [Page 15]
 
 Internet-Draft              NSEC/NSEC3 usage               November 2016
 
+
+   If the next domain name sorts before or matches the NSEC owner name
+   and the given name is not a subdomain of the next domain name then
+   discard the NSEC as it does not prove the NXDOMAIN or ENT.
 
    You now have a NSEC record that proves the NXDOMAIN or ENT.
 
@@ -878,10 +882,6 @@ Authors' Addresses
    US
 
    Email: warren@kumari.net
-
-
-
-
 
 
 
