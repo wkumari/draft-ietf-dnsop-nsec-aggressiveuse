@@ -123,9 +123,10 @@
       Lookaside Validation (DLV) <xref target="RFC5074"/> in order to find
       covering NSEC records efficiently.</t>
 
-      <t> <xref target="RFC8020"/> proposes a first step to using NXDOMAIN
-      information for more effective caching. This takes this technique
-      further.</t>
+      <t> <xref target="RFC8020"/>, and <xref
+      target="I-D.vixie-dnsext-resimprove"/> proposes first steps to using
+      NXDOMAIN information for more effective caching. This takes this
+      technique further.</t>
     </section>
 
     <section anchor="terminology" title="Terminology">
@@ -195,8 +196,8 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
       <xref target="RFC7129"/>, section 5.3 for more details).</t>
 
       <t>If the validating resolver gets a query for banana.example.org it
-      will once again go off and query the example.com servers for
-      banana.example.com (even though it already has proof that there is a
+      will once again go off and query the example.org servers for
+      banana.example.org (even though it already has proof that there is a
       wildcard record) - just like above, this has privacy implications,
       wastes resources, can be used to contribute to a DoS, etc.</t>
     </section>
@@ -239,7 +240,7 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
       Similarly, if the resolver is generating responses from a wildcard
       record, it will continue to do so (for the</t>
 
-      <t>We believe this recommendation can be relaxed because, in the absense
+      <t>We believe this recommendation can be relaxed because, in the absence
       of this technique, a lookup for the exact name could have come in during
       this interval, and so a negative answer could already be cached (see
       <xref target="RFC2308"/> for more background). This means that zone
@@ -353,7 +354,7 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
           not need to allocate and maintain state, thereby decreasing memory
           and CPU load.</t>
 
-          <t hangText="Decreased authorative server load:">Because recursive
+          <t hangText="Decreased authoritative server load:">Because recursive
           servers can answer queries without asking the authoritative server,
           the authoritative servers receive fewer queries. This decreases the
           authoritative server bandwidth, queries per second and CPU
@@ -391,12 +392,12 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
 
       <figure>
         <artwork><![CDATA[
-+--------------------------------------------------------------+
-|  Once the records are validated, DNSSEC enabled validating   |
-|  resolvers MAY use wildcards and NSEC/NSEC3 resource records |
-|  to generate positive and negative responses until the       |
-|  effective TTLs or signatures for those records expire.      |
-+--------------------------------------------------------------+
++-----------------------------------------------------------------+
+|  Once the records are validated, DNSSEC enabled validating      |
+|  resolvers SHOULD use wildcards and NSEC/NSEC3 resource records |
+|  to generate positive and negative responses until the          |
+|  effective TTLs or signatures for those records expire.         |
++-----------------------------------------------------------------+
 ]]></artwork>
       </figure>
     </section>
@@ -916,41 +917,6 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
       </reference>
 
       <?rfc include='reference.RFC.8020'?>
-
-      <reference anchor="I-D.ietf-dnsop-nxdomain-cut">
-        <front>
-          <title>NXDOMAIN really means there is nothing underneath</title>
-
-          <author fullname="Stephane Bortzmeyer" initials="S"
-                  surname="Bortzmeyer">
-            <organization/>
-          </author>
-
-          <author fullname="Shumon Huque" initials="S" surname="Huque">
-            <organization/>
-          </author>
-
-          <date day="8" month="May" year="2016"/>
-
-          <abstract>
-            <t>This document states clearly that when a DNS resolver receives
-            a response with response code of NXDOMAIN, it means that the
-            domain name which is thus denied AND ALL THE NAMES UNDER IT do not
-            exist. REMOVE BEFORE PUBLICATION: this document should be
-            discussed in the IETF DNSOP (DNS Operations) group, through its
-            mailing list. The source of the document, as well as a list of
-            open issues, is currently kept at Github [1]. This documents
-            clarifies RFC 1034 and modifies a bit RFC 2308 so it updates both
-            of them.</t>
-          </abstract>
-        </front>
-
-        <seriesInfo name="Internet-Draft"
-                    value="draft-ietf-dnsop-nxdomain-cut-03"/>
-
-        <format target="http://www.ietf.org/internet-drafts/draft-ietf-dnsop-nxdomain-cut-03.txt"
-                type="TXT"/>
-      </reference>
 
       <reference anchor="root-servers.org"
                  target="http://www.root-servers.org/">
