@@ -439,12 +439,16 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
       <t>The authors gratefully acknowledge DLV <xref target="RFC5074"/>
       author Samuel Weiler and the Unbound developers.</t>
 
+      <t>Thanks to Mark Andrews for providing the helpful notes for
+      implementors provided in Appendix B.</t>
+
       <t>The authors would like to specifically thank Stephane Bortzmeyer (for
       standing next to and helping edit), Ralph Dolmans, Tony Finch, Tatuya
       JINMEI for extensive review and comments, and also Mark Andrews, Casey
       Deccio, Alexander Dupuy, Olafur Gudmundsson, Bob Harold, Shumon Huque,
       John Levine, Pieter Lexis, Matthijs Mekking (who even sent pull
-      requests!) and Ondrej Sury. Mark Andrews also provided the text
+      requests!) and Ondrej Sury. Mark Andrews also provided the helpful notes
+      for implementors
       (https://www.ietf.org/mail-archive/web/dnsop/current/msg18332.html)
       which we made into Appendix B.</t>
 
@@ -961,12 +965,10 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
         </list></t>
     </section>
 
-    <section title="Procedure for determining ENT vs NXDOMAN">
-      <t>Thanks to Mark Andrews for providing these helpful notes for
-      implementors. As they are more general than for Aggressive NSEC we have
-      placed them in an appendix. This procedure outlines how to determine if
+    <section title="Procedure for determining ENT vs NXDOMAN with NSEC">
+      <t>This procedure outlines how to determine if
       a given name does not exist, or is an ENT (Empty Non-Terminal, see <xref
-      target="RFC5155"/> Section 1.3)</t>
+      target="RFC5155"/> Section 1.3) with NSEC.</t>
 
       <t>If the NSEC record has not been verified as secure discard it.</t>
 
