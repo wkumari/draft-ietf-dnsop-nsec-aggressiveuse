@@ -414,9 +414,7 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
 
       <t>It is also suggested to limit the maximum TTL value of NSEC / NSEC3
       resource records in the negative cache to, for example, 10800 seconds
-      (3hrs), to mitigate this issue. Implementations which comply with this
-      proposal are recommended to have a configurable maximum value of NSEC
-      RRs in the negative cache.</t>
+      (3hrs), to mitigate this issue.</t>
 
       <t>Although the TTL of NSEC/NSEC3 records is typically fairly short
       (minutes or hours), their RRSIG expiration time can be much further in
