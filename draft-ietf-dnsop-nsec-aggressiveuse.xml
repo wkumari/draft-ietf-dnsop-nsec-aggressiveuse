@@ -105,8 +105,8 @@
 
   <middle>
     <section anchor="introduction" title="Introduction">
-      <t>A DNS negative cache exists, and is used to cache the fact that a
-      name does not exist. This method of negative caching requires exact
+      <t>A DNS negative cache exists, and is used to cache the fact that an
+      RRset does not exist. This method of negative caching requires exact
       matching; this leads to unnecessary additional lookups, increases
       latency, leads to extra resource utilization on both authoritative and
       recursive servers, and decreases privacy by leaking queries.</t>

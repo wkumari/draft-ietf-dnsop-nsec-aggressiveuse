@@ -118,8 +118,8 @@ Internet-Draft              NSEC/NSEC3 usage               November 2016
 
 1.  Introduction
 
-   A DNS negative cache exists, and is used to cache the fact that a
-   name does not exist.  This method of negative caching requires exact
+   A DNS negative cache exists, and is used to cache the fact that an
+   RRset does not exist.  This method of negative caching requires exact
    matching; this leads to unnecessary additional lookups, increases
    latency, leads to extra resource utilization on both authoritative
    and recursive servers, and decreases privacy by leaking queries.
@@ -714,8 +714,8 @@ Internet-Draft              NSEC/NSEC3 usage               November 2016
 12.1.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
-              Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/
-              RFC2119, March 1997,
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
               <http://www.rfc-editor.org/info/rfc2119>.
 
    [RFC2308]  Andrews, M., "Negative Caching of DNS Queries (DNS
