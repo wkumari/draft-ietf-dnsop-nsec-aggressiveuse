@@ -194,7 +194,8 @@ Internet-Draft              NSEC/NSEC3 usage               November 2016
    attackers to cause a DoS (see additional resources), and also has
    privacy implications (e.g: typos leak out further than necessary).
 
-   Now, assume that the (DNSSEC signed) "example.org" zone contains:
+   Another example: assume that the (DNSSEC signed) "example.org" zone
+   contains:
 
    avocado.example.org   IN A 192.0.2.1
    *.example.org         IN A 192.0.2.2
@@ -213,7 +214,6 @@ Internet-Draft              NSEC/NSEC3 usage               November 2016
    banana.example.org (even though it already has proof that there is a
    wildcard record) - just like above, this has privacy implications,
    wastes resources, can be used to contribute to a DoS, etc.
-
 
 
 

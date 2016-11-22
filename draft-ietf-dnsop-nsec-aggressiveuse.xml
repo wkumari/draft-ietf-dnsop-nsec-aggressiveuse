@@ -178,7 +178,7 @@ zebra.example.com     IN A 192.0.2.3]]></artwork>
       attackers to cause a DoS (see additional resources), and also has
       privacy implications (e.g: typos leak out further than necessary).</t>
 
-      <t>Now, assume that the (DNSSEC signed) "example.org" zone contains:</t>
+      <t>Another example: assume that the (DNSSEC signed) "example.org" zone contains:</t>
 
       <t><figure>
           <artwork><![CDATA[avocado.example.org   IN A 192.0.2.1
