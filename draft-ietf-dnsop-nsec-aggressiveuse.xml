@@ -140,9 +140,6 @@
 
       <t>The key words "Source of Synthesis" in this document are to be
       interpreted as described in <xref target="RFC4592"/>.</t>
-
-      <t>"Closest Encloser" is also defined in NSEC3 <xref target="RFC5155"/>,
-      as is "Next closer name".</t>
     </section>
 
     <section anchor="problem-statement" title="Problem Statement">
@@ -178,7 +175,8 @@ zebra.example.com     IN A 192.0.2.3]]></artwork>
       attackers to cause a DoS (see additional resources), and also has
       privacy implications (e.g: typos leak out further than necessary).</t>
 
-      <t>Another example: assume that the (DNSSEC signed) "example.org" zone contains:</t>
+      <t>Another example: assume that the (DNSSEC signed) "example.org" zone
+      contains:</t>
 
       <t><figure>
           <artwork><![CDATA[avocado.example.org   IN A 192.0.2.1
@@ -369,7 +367,7 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
       directly from cache for any random queries which fall within already
       requested ranges. It will not always work as an effective defense, not
       least because not many zones are DNSSEC signed at all -- but it will
-      still provide an additional layer of defense. </t>
+      still provide an additional layer of defense.</t>
 
       <t>As these benefits are only accrued by those using DNSSEC, it is hoped
       that these techniques will lead to more DNSSEC deployment.</t>
@@ -966,9 +964,9 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
     </section>
 
     <section title="Procedure for determining ENT vs NXDOMAN with NSEC">
-      <t>This procedure outlines how to determine if
-      a given name does not exist, or is an ENT (Empty Non-Terminal, see <xref
-      target="RFC5155"/> Section 1.3) with NSEC.</t>
+      <t>This procedure outlines how to determine if a given name does not
+      exist, or is an ENT (Empty Non-Terminal, see <xref target="RFC5155"/>
+      Section 1.3) with NSEC.</t>
 
       <t>If the NSEC record has not been verified as secure discard it.</t>
 
