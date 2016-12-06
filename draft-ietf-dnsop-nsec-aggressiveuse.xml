@@ -202,16 +202,19 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
     <section title="Background">
       <t>DNSSEC <xref target="RFC4035"/> and <xref target="RFC5155"/> both
       provide "authenticated denial of existence"; this is a cryptographic
-      proof that the queried for name does not exist, accomplished by
-      providing a (DNSSEC secured) record containing the names which appear
-      alphabetically before and after the queried for name. In the first
-      example above, if the (DNSSEC validating) recursive server were to query
-      for dog.example.com it would receive a (signed) NSEC record stating that
-      there are no labels between "albatross" and "elephant" (or, for NSEC3, a
-      similar pair of hashed names). This is a signed, cryptographic proof
-      that these names are the ones before and after the queried for label. As
-      dog.example.com falls within this range, the recursive server knows that
-      dog.example.com really does not exist.</t>
+      proof that the queried for name does not exist or type does not exist.
+      Proof that a name does not exist is accomplished by providing a (DNSSEC
+      secured) record containing the names which appear alphabetically before
+      and after the queried for name. In the first example above, if the
+      (DNSSEC validating) recursive server were to query for dog.example.com
+      it would receive a (signed) NSEC record stating that there are no labels
+      between "albatross" and "elephant" (or, for NSEC3, a similar pair of
+      hashed names). This is a signed, cryptographic proof that these names
+      are the ones before and after the queried for label. As dog.example.com
+      falls within this range, the recursive server knows that dog.example.com
+      really does not exist. Proof that a type does not exist is accomplished
+      by providing a (DNSSEC secured) record containing the queried for name,
+      and a type bitmap which does not include the requested type.</t>
 
       <t>This document specifies that this NSEC/NSEC3 record should be used to
       generate negative answers for any queries that the validating server
@@ -301,9 +304,10 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
         not exist without the wildcard match, determined according to the
         rules set out in <xref target="RFC4035">Section 5.3.4 of</xref>
         (NSEC), or in <xref target="RFC5155">Section 8.8 of</xref>, it SHOULD
-        synthesize an answer for that name using the cached deduced wildcard.
-        If the corresponding wildcard record is not in the cache, it MUST fall
-        back to send the query to the authoritative DNS servers.</t>
+        synthesize an answer (or NODATA response) for that name using the
+        cached deduced wildcard. If the corresponding wildcard record is not
+        in the cache, it MUST fall back to send the query to the authoritative
+        DNS servers.</t>
       </section>
 
       <section anchor="consideration-on-ttl" title="Consideration on TTL">
@@ -461,6 +465,9 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
             title.</t>
 
             <t>We had the cut-and-paste of what changed in 4035 twice.</t>
+
+            <t>Clarified that this also allows NODATA responses to be
+            synthesized.</t>
           </list></t>
 
         <t>-04 to -05:<list style="symbols">
@@ -942,9 +949,10 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
           aggressive negative caching, a validator will not make queries for
           any name covered by a cached and validated NSEC record. Furthermore,
           a validator answering queries from clients will synthesize a
-          negative answer whenever it has an applicable validated NSEC in its
-          cache unless the CD bit was set on the incoming query. (Imported
-          from Section 6 of <xref target="RFC5074"/>).</t>
+          negative answer (or NODATA response) whenever it has an applicable
+          validated NSEC in its cache unless the CD bit was set on the
+          incoming query. (Imported from Section 6 of <xref
+          target="RFC5074"/>).</t>
 
           <t>Implementing aggressive negative caching suggests that a
           validator will need to build an ordered data structure of NSEC and
