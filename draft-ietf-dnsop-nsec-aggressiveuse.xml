@@ -6,7 +6,7 @@
 <?rfc tocdepth="4"?>
 <?rfc sortrefs="yes"?>
 <?rfc symrefs="yes"?>
-<rfc category="std" docName="draft-ietf-dnsop-nsec-aggressiveuse-06"
+<rfc category="std" docName="draft-ietf-dnsop-nsec-aggressiveuse-07"
      ipr="trust200902" updates="4035">
   <front>
     <title abbrev="NSEC/NSEC3 usage">Aggressive use of NSEC/NSEC3</title>
@@ -73,7 +73,7 @@
       </address>
     </author>
 
-    <date day="16" month="November" year="2016"/>
+    <date day="13" month="December" year="2016"/>
 
     <area>operations</area>
 

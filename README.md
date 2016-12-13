@@ -8,13 +8,13 @@ Network Working Group                                        K. Fujiwara
 Internet-Draft                                                      JPRS
 Updates: 4035 (if approved)                                      A. Kato
 Intended status: Standards Track                               Keio/WIDE
-Expires: May 20, 2017                                          W. Kumari
+Expires: June 16, 2017                                         W. Kumari
                                                                   Google
-                                                       November 16, 2016
+                                                       December 13, 2016
 
 
                       Aggressive use of NSEC/NSEC3
-                 draft-ietf-dnsop-nsec-aggressiveuse-06
+                 draft-ietf-dnsop-nsec-aggressiveuse-07
 
 Abstract
 
@@ -55,15 +55,15 @@ Status of This Memo
 
 
 
-Fujiwara, et al.          Expires May 20, 2017                  [Page 1]
+Fujiwara, et al.          Expires June 16, 2017                 [Page 1]
 
-Internet-Draft              NSEC/NSEC3 usage               November 2016
+Internet-Draft              NSEC/NSEC3 usage               December 2016
 
 
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on May 20, 2017.
+   This Internet-Draft will expire on June 16, 2017.
 
 Copyright Notice
 
@@ -111,9 +111,9 @@ Table of Contents
 
 
 
-Fujiwara, et al.          Expires May 20, 2017                  [Page 2]
+Fujiwara, et al.          Expires June 16, 2017                 [Page 2]
 
-Internet-Draft              NSEC/NSEC3 usage               November 2016
+Internet-Draft              NSEC/NSEC3 usage               December 2016
 
 
 1.  Introduction
@@ -167,9 +167,9 @@ Internet-Draft              NSEC/NSEC3 usage               November 2016
 
 
 
-Fujiwara, et al.          Expires May 20, 2017                  [Page 3]
+Fujiwara, et al.          Expires June 16, 2017                 [Page 3]
 
-Internet-Draft              NSEC/NSEC3 usage               November 2016
+Internet-Draft              NSEC/NSEC3 usage               December 2016
 
 
    If a validating resolver receives a query for cat.example.com, it
@@ -223,9 +223,9 @@ Internet-Draft              NSEC/NSEC3 usage               November 2016
 
 
 
-Fujiwara, et al.          Expires May 20, 2017                  [Page 4]
+Fujiwara, et al.          Expires June 16, 2017                 [Page 4]
 
-Internet-Draft              NSEC/NSEC3 usage               November 2016
+Internet-Draft              NSEC/NSEC3 usage               December 2016
 
 
    queried for name.  In the first example above, if the (DNSSEC
@@ -279,9 +279,9 @@ Internet-Draft              NSEC/NSEC3 usage               November 2016
 
 
 
-Fujiwara, et al.          Expires May 20, 2017                  [Page 5]
+Fujiwara, et al.          Expires June 16, 2017                 [Page 5]
 
-Internet-Draft              NSEC/NSEC3 usage               November 2016
+Internet-Draft              NSEC/NSEC3 usage               December 2016
 
 
 5.  Aggressive use of Cache
@@ -335,9 +335,9 @@ Internet-Draft              NSEC/NSEC3 usage               November 2016
 
 
 
-Fujiwara, et al.          Expires May 20, 2017                  [Page 6]
+Fujiwara, et al.          Expires June 16, 2017                 [Page 6]
 
-Internet-Draft              NSEC/NSEC3 usage               November 2016
+Internet-Draft              NSEC/NSEC3 usage               December 2016
 
 
    use of NSEC/NSEC3 for negative answers, we revise this
@@ -391,9 +391,9 @@ Internet-Draft              NSEC/NSEC3 usage               November 2016
 
 
 
-Fujiwara, et al.          Expires May 20, 2017                  [Page 7]
+Fujiwara, et al.          Expires June 16, 2017                 [Page 7]
 
-Internet-Draft              NSEC/NSEC3 usage               November 2016
+Internet-Draft              NSEC/NSEC3 usage               December 2016
 
 
    Decreased authoritative server load:  Because recursive servers can
@@ -447,9 +447,9 @@ Internet-Draft              NSEC/NSEC3 usage               November 2016
 
 
 
-Fujiwara, et al.          Expires May 20, 2017                  [Page 8]
+Fujiwara, et al.          Expires June 16, 2017                 [Page 8]
 
-Internet-Draft              NSEC/NSEC3 usage               November 2016
+Internet-Draft              NSEC/NSEC3 usage               December 2016
 
 
 8.  IANA Considerations
@@ -503,9 +503,9 @@ Internet-Draft              NSEC/NSEC3 usage               November 2016
 
 
 
-Fujiwara, et al.          Expires May 20, 2017                  [Page 9]
+Fujiwara, et al.          Expires June 16, 2017                 [Page 9]
 
-Internet-Draft              NSEC/NSEC3 usage               November 2016
+Internet-Draft              NSEC/NSEC3 usage               December 2016
 
 
    Casey Deccio, Alexander Dupuy, Olafur Gudmundsson, Bob Harold, Shumon
@@ -559,9 +559,9 @@ Internet-Draft              NSEC/NSEC3 usage               November 2016
 
 
 
-Fujiwara, et al.          Expires May 20, 2017                 [Page 10]
+Fujiwara, et al.          Expires June 16, 2017                [Page 10]
 
-Internet-Draft              NSEC/NSEC3 usage               November 2016
+Internet-Draft              NSEC/NSEC3 usage               December 2016
 
 
       *  Reworded much of the Wildcard text.
@@ -615,9 +615,9 @@ Internet-Draft              NSEC/NSEC3 usage               November 2016
 
 
 
-Fujiwara, et al.          Expires May 20, 2017                 [Page 11]
+Fujiwara, et al.          Expires June 16, 2017                [Page 11]
 
-Internet-Draft              NSEC/NSEC3 usage               November 2016
+Internet-Draft              NSEC/NSEC3 usage               December 2016
 
 
    o  Replaced "full-service" with "validating" (where applicable)
@@ -671,9 +671,9 @@ Internet-Draft              NSEC/NSEC3 usage               November 2016
 
 
 
-Fujiwara, et al.          Expires May 20, 2017                 [Page 12]
+Fujiwara, et al.          Expires June 16, 2017                [Page 12]
 
-Internet-Draft              NSEC/NSEC3 usage               November 2016
+Internet-Draft              NSEC/NSEC3 usage               December 2016
 
 
 11.1.1.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-01
@@ -727,9 +727,9 @@ Internet-Draft              NSEC/NSEC3 usage               November 2016
 
 
 
-Fujiwara, et al.          Expires May 20, 2017                 [Page 13]
+Fujiwara, et al.          Expires June 16, 2017                [Page 13]
 
-Internet-Draft              NSEC/NSEC3 usage               November 2016
+Internet-Draft              NSEC/NSEC3 usage               December 2016
 
 
    [RFC4035]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
@@ -783,9 +783,9 @@ Appendix A.  Detailed implementation notes
 
 
 
-Fujiwara, et al.          Expires May 20, 2017                 [Page 14]
+Fujiwara, et al.          Expires June 16, 2017                [Page 14]
 
-Internet-Draft              NSEC/NSEC3 usage               November 2016
+Internet-Draft              NSEC/NSEC3 usage               December 2016
 
 
       validator, in addition to checking to see if the answer is in its
@@ -839,9 +839,9 @@ Appendix B.  Procedure for determining ENT vs NXDOMAN with NSEC
 
 
 
-Fujiwara, et al.          Expires May 20, 2017                 [Page 15]
+Fujiwara, et al.          Expires June 16, 2017                [Page 15]
 
-Internet-Draft              NSEC/NSEC3 usage               November 2016
+Internet-Draft              NSEC/NSEC3 usage               December 2016
 
 
    You now have a NSEC record that proves the NXDOMAIN or ENT.
@@ -895,5 +895,5 @@ Authors' Addresses
 
 
 
-Fujiwara, et al.          Expires May 20, 2017                 [Page 16]
+Fujiwara, et al.          Expires June 16, 2017                [Page 16]
 ```
