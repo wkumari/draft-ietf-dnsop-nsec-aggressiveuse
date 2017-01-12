@@ -13,8 +13,8 @@ Expires: June 16, 2017                                         W. Kumari
                                                        December 13, 2016
 
 
-                      Aggressive use of NSEC/NSEC3
-                 draft-ietf-dnsop-nsec-aggressiveuse-07
+                Aggressive use of DNSSEC-validated cache
+                 draft-ietf-dnsop-nsec-aggressiveuse-08
 
 Abstract
 
@@ -93,8 +93,8 @@ Table of Contents
      5.4.  Consideration on TTL  . . . . . . . . . . . . . . . . . .   7
    6.  Benefits  . . . . . . . . . . . . . . . . . . . . . . . . . .   7
    7.  Update to RFC 4035  . . . . . . . . . . . . . . . . . . . . .   8
-   8.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   9
-   9.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
+   8.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   8
+   9.  Security Considerations . . . . . . . . . . . . . . . . . . .   8
    10. Implementation Status . . . . . . . . . . . . . . . . . . . .   9
    11. Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .   9
      11.1.  Change History . . . . . . . . . . . . . . . . . . . . .  10
@@ -286,14 +286,8 @@ Internet-Draft              NSEC/NSEC3 usage               December 2016
 
 5.  Aggressive use of Cache
 
-   Section 4.5 of [RFC4035] says that "In theory, a resolver could use
-   wildcards or NSEC RRs to generate positive and negative responses
-   (respectively) until the TTL or signatures on the records in question
-   expire.  However, it seems prudent for resolvers to avoid blocking
-   new authoritative data or synthesizing new data on their own.
-   Resolvers that follow this recommendation will have a more consistent
-   view of the namespace".  This document relaxes this this restriction,
-   see Section 7 for more detail.
+   This document relaxes the restriction given in Section 4.5 of
+   [RFC4035], see Section 7 for more detail.
 
    If the negative cache of the validating resolver has sufficient
    information to validate the query, the resolver SHOULD use NSEC,
@@ -332,6 +326,12 @@ Internet-Draft              NSEC/NSEC3 usage               December 2016
    The last paragraph of [RFC4035] Section 4.5 also discusses the use of
    wildcards and NSEC RRs to generate positive responses and recommends
    that it not be relied upon.  Just like the case for the aggressive
+   use of NSEC/NSEC3 for negative answers, we revise this
+   recommendation.
+
+   As long as the validating resolver can determine that a name would
+   not exist without the wildcard match, determined according to the
+   rules set out in Section 5.3.4 of [RFC4035] (NSEC), or in Section 8.8
 
 
 
@@ -340,12 +340,6 @@ Fujiwara, et al.          Expires June 16, 2017                 [Page 6]
 Internet-Draft              NSEC/NSEC3 usage               December 2016
 
 
-   use of NSEC/NSEC3 for negative answers, we revise this
-   recommendation.
-
-   As long as the validating resolver can determine that a name would
-   not exist without the wildcard match, determined according to the
-   rules set out in Section 5.3.4 of [RFC4035] (NSEC), or in Section 8.8
    of [RFC5155], it SHOULD synthesize an answer (or NODATA response) for
    that name using the cached deduced wildcard.  If the corresponding
    wildcard record is not in the cache, it MUST fall back to send the
@@ -389,18 +383,18 @@ Internet-Draft              NSEC/NSEC3 usage               December 2016
       allocate and maintain state, thereby decreasing memory and CPU
       load.
 
+   Decreased authoritative server load:  Because recursive servers can
+      answer queries without asking the authoritative server, the
+      authoritative servers receive fewer queries.  This decreases the
+      authoritative server bandwidth, queries per second and CPU
+      utilization.
+
 
 
 Fujiwara, et al.          Expires June 16, 2017                 [Page 7]
 
 Internet-Draft              NSEC/NSEC3 usage               December 2016
 
-
-   Decreased authoritative server load:  Because recursive servers can
-      answer queries without asking the authoritative server, the
-      authoritative servers receive fewer queries.  This decreases the
-      authoritative server bandwidth, queries per second and CPU
-      utilization.
 
    The scale of the benefit depends upon multiple factors, including the
    query distribution.  For example, at the time of this writing, around
@@ -441,17 +435,6 @@ Internet-Draft              NSEC/NSEC3 usage               December 2016
    |  effective TTLs or signatures for those records expire.         |
    +-----------------------------------------------------------------+
 
-
-
-
-
-
-
-Fujiwara, et al.          Expires June 16, 2017                 [Page 8]
-
-Internet-Draft              NSEC/NSEC3 usage               December 2016
-
-
 8.  IANA Considerations
 
    This document has no IANA actions.
@@ -461,6 +444,13 @@ Internet-Draft              NSEC/NSEC3 usage               December 2016
    Use of NSEC / NSEC3 resource records without DNSSEC validation may
    create serious security issues, and so this technique requires DNSSEC
    validation.
+
+
+
+Fujiwara, et al.          Expires June 16, 2017                 [Page 8]
+
+Internet-Draft              NSEC/NSEC3 usage               December 2016
+
 
    Newly registered resource records may not be used immediately.
    However, choosing suitable TTL value and negative cache TTL value
@@ -500,6 +490,16 @@ Internet-Draft              NSEC/NSEC3 usage               December 2016
    The authors would like to specifically thank Stephane Bortzmeyer (for
    standing next to and helping edit), Ralph Dolmans, Tony Finch, Tatuya
    JINMEI for extensive review and comments, and also Mark Andrews,
+   Casey Deccio, Alexander Dupuy, Olafur Gudmundsson, Bob Harold, Shumon
+   Huque, John Levine, Pieter Lexis, Matthijs Mekking (who even sent
+   pull requests!) and Ondrej Sury.  Mark Andrews also provided the
+   helpful notes for implementors (https://www.ietf.org/mail-
+   archive/web/dnsop/current/msg18332.html) which we made into
+   Appendix B.
+
+
+
+
 
 
 
@@ -507,13 +507,6 @@ Fujiwara, et al.          Expires June 16, 2017                 [Page 9]
 
 Internet-Draft              NSEC/NSEC3 usage               December 2016
 
-
-   Casey Deccio, Alexander Dupuy, Olafur Gudmundsson, Bob Harold, Shumon
-   Huque, John Levine, Pieter Lexis, Matthijs Mekking (who even sent
-   pull requests!) and Ondrej Sury.  Mark Andrews also provided the
-   helpful notes for implementors (https://www.ietf.org/mail-
-   archive/web/dnsop/current/msg18332.html) which we made into
-   Appendix B.
 
 11.1.  Change History
 
@@ -557,18 +550,19 @@ Internet-Draft              NSEC/NSEC3 usage               December 2016
          appropriate) to explain that this isn't just for negative
          answers.
 
+      *  Reworded much of the Wildcard text.
+
+   o  Incorporated pull request from Tony Finch (thanks!):
+      https://github.com/wkumari/draft-ietf-dnsop-nsec-aggressiveuse/
+      pull/1
+
+
 
 
 Fujiwara, et al.          Expires June 16, 2017                [Page 10]
 
 Internet-Draft              NSEC/NSEC3 usage               December 2016
 
-
-      *  Reworded much of the Wildcard text.
-
-   o  Incorporated pull request from Tony Finch (thanks!):
-      https://github.com/wkumari/draft-ietf-dnsop-nsec-aggressiveuse/
-      pull/1
 
    o  More fixups from Tony (including text): https://www.ietf.org/mail-
       archive/web/dnsop/current/msg18271.html.  This included much
@@ -612,6 +606,12 @@ Internet-Draft              NSEC/NSEC3 usage               December 2016
 
    o  Removed Appendix B (Jinmei)
 
+   o  Replaced "full-service" with "validating" (where applicable)
+
+   o  Integrated other comments from Jinmei from https://www.ietf.org/
+      mail-archive/web/dnsop/current/msg17875.html
+
+
 
 
 
@@ -619,11 +619,6 @@ Fujiwara, et al.          Expires June 16, 2017                [Page 11]
 
 Internet-Draft              NSEC/NSEC3 usage               December 2016
 
-
-   o  Replaced "full-service" with "validating" (where applicable)
-
-   o  Integrated other comments from Jinmei from https://www.ietf.org/
-      mail-archive/web/dnsop/current/msg17875.html
 
    o  Integrated comment from co-authors, including re-adding parts of
       Appendix B, terminology, typos.
@@ -671,6 +666,11 @@ Internet-Draft              NSEC/NSEC3 usage               December 2016
 
 
 
+
+
+
+
+
 Fujiwara, et al.          Expires June 16, 2017                [Page 12]
 
 Internet-Draft              NSEC/NSEC3 usage               December 2016
@@ -714,8 +714,8 @@ Internet-Draft              NSEC/NSEC3 usage               December 2016
 12.1.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
-              Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/
-              RFC2119, March 1997,
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
               <http://www.rfc-editor.org/info/rfc2119>.
 
    [RFC2308]  Andrews, M., "Negative Caching of DNS Queries (DNS

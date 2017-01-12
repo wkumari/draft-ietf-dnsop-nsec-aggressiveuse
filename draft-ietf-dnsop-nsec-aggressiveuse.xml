@@ -6,10 +6,10 @@
 <?rfc tocdepth="4"?>
 <?rfc sortrefs="yes"?>
 <?rfc symrefs="yes"?>
-<rfc category="std" docName="draft-ietf-dnsop-nsec-aggressiveuse-07"
+<rfc category="std" docName="draft-ietf-dnsop-nsec-aggressiveuse-08"
      ipr="trust200902" updates="4035">
   <front>
-    <title abbrev="NSEC/NSEC3 usage">Aggressive use of NSEC/NSEC3</title>
+    <title abbrev="NSEC/NSEC3 usage">Aggressive use of DNSSEC-validated cache</title>
 
     <author fullname="Kazunori Fujiwara" initials="K." surname="Fujiwara">
       <organization abbrev="JPRS">Japan Registry Services Co.,
@@ -252,14 +252,8 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
 
     <section anchor="aggressive-negative-caching"
              title="Aggressive use of Cache">
-      <t>Section 4.5 of <xref target="RFC4035"/> says that "In theory, a
-      resolver could use wildcards or NSEC RRs to generate positive and
-      negative responses (respectively) until the TTL or signatures on the
-      records in question expire. However, it seems prudent for resolvers to
-      avoid blocking new authoritative data or synthesizing new data on their
-      own. Resolvers that follow this recommendation will have a more
-      consistent view of the namespace". This document relaxes this this
-      restriction, see Section 7 for more detail.</t>
+      <t>This document relaxes the restriction given in Section 4.5 of
+      <xref target="RFC4035"/>, see Section 7 for more detail.</t>
 
       <t>If the negative cache of the validating resolver has sufficient
       information to validate the query, the resolver SHOULD use NSEC, NSEC3
