@@ -13,7 +13,7 @@ Expires: June 16, 2017                                         W. Kumari
                                                        December 13, 2016
 
 
-                Aggressive use of DNSSEC-validated cache
+                Aggressive use of DNSSEC-validated Cache
                  draft-ietf-dnsop-nsec-aggressiveuse-08
 
 Abstract
