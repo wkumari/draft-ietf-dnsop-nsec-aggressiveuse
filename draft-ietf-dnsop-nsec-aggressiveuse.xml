@@ -6,10 +6,11 @@
 <?rfc tocdepth="4"?>
 <?rfc sortrefs="yes"?>
 <?rfc symrefs="yes"?>
-<rfc category="std" docName="draft-ietf-dnsop-nsec-aggressiveuse-08"
+<rfc category="std" docName="draft-ietf-dnsop-nsec-aggressiveuse-09"
      ipr="trust200902" updates="4035">
   <front>
-    <title abbrev="NSEC/NSEC3 usage">Aggressive use of DNSSEC-validated Cache</title>
+    <title abbrev="NSEC/NSEC3 usage">Aggressive use of DNSSEC-validated
+    Cache</title>
 
     <author fullname="Kazunori Fujiwara" initials="K." surname="Fujiwara">
       <organization abbrev="JPRS">Japan Registry Services Co.,
@@ -73,7 +74,7 @@
       </address>
     </author>
 
-    <date day="12" month="January" year="2017"/>
+    <date day="30" month="March" year="2017"/>
 
     <area>operations</area>
 
@@ -111,21 +112,21 @@
       latency, leads to extra resource utilization on both authoritative and
       recursive servers, and decreases privacy by leaking queries.</t>
 
-      <t>This document updates RFC 4035 to allow recursive resolvers to use
-      NSEC/NSEC3 resource records to synthesize negative answers from the
-      information they have in the cache. This allows validating resolvers to
-      respond with a negative answer immediately if the name in question falls
-      into a range expressed by a NSEC/NSEC3 resource record already in the
-      cache. It also allows the synthesis of positive answers in the presence
-      of wildcard records.</t>
+      <t>This document updates RFC 4035 to allow resolvers to use NSEC/NSEC3
+      resource records to synthesize negative answers from the information
+      they have in the cache. This allows validating resolvers to respond with
+      a negative answer immediately if the name in question falls into a range
+      expressed by a NSEC/NSEC3 resource record already in the cache. It also
+      allows the synthesis of positive answers in the presence of wildcard
+      records.</t>
 
       <t>Aggressive Negative Caching was first proposed in Section 6 of DNSSEC
       Lookaside Validation (DLV) <xref target="RFC5074"/> in order to find
       covering NSEC records efficiently.</t>
 
-      <t><xref target="RFC8020"/>, and <xref
-      target="I-D.vixie-dnsext-resimprove"/> proposes first steps to using
-      NXDOMAIN information for more effective caching. This takes this
+      <t><xref target="RFC8020"/> and <xref
+      target="I-D.vixie-dnsext-resimprove"/> propose steps to using NXDOMAIN
+      information for more effective caching. This document takes this
       technique further.</t>
     </section>
 
@@ -184,13 +185,13 @@ zebra.example.com     IN A 192.0.2.3]]></artwork>
 zucchini.example.org IN A 192.0.2.3]]></artwork>
         </figure></t>
 
-      <t>If a query is received for leek.example.org, it contacts its resolver
-      (which may be itself) to query the example.org servers and will get back
-      an NSEC record stating that there are no records (alphabetically)
-      between avocado and zucchini (or an NSEC3 record stating there is
-      nothing between two hashed names), as well as an answer for
-      leek.example.org, with the label count of the signature set to two (see
-      <xref target="RFC7129"/>, section 5.3 for more details).</t>
+      <t>If a query is received for leek.example.org, the system contacts its
+      resolver (which may be itself) to query the example.org servers and will
+      get back an NSEC record stating that there are no records
+      (alphabetically) between avocado and zucchini (or an NSEC3 record
+      stating there is nothing between two hashed names), as well as an answer
+      for leek.example.org, with the label count of the signature set to two
+      (see <xref target="RFC7129"/>, section 5.3 for more details).</t>
 
       <t>If the validating resolver gets a query for banana.example.org it
       will once again go off and query the example.org servers for
@@ -252,8 +253,8 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
 
     <section anchor="aggressive-negative-caching"
              title="Aggressive use of Cache">
-      <t>This document relaxes the restriction given in Section 4.5 of
-      <xref target="RFC4035"/>, see Section 7 for more detail.</t>
+      <t>This document relaxes the restriction given in Section 4.5 of <xref
+      target="RFC4035"/>, see Section 7 for more detail.</t>
 
       <t>If the negative cache of the validating resolver has sufficient
       information to validate the query, the resolver SHOULD use NSEC, NSEC3
@@ -309,10 +310,10 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
         because newly added domain names cannot be used while the negative
         information is effective.</t>
 
-        <t><xref target="RFC2308">Section 5 of</xref> states that the maximum
-        number of negative cache TTL value is 3 hours (10800). It is
-        RECOMMENDED that validating resolvers limit the maximum effective TTL
-        value of negative responses (NSEC/NSEC3 RRs) to this same value.</t>
+        <t><xref target="RFC2308">Section 5 of</xref> suggests a maximum
+        default negative cache TTL value of 3 hours (10800). It is RECOMMENDED
+        that validating resolvers limit the maximum effective TTL value of
+        negative responses (NSEC/NSEC3 RRs) to this same value.</t>
 
         <t>Section 5 of <xref target="RFC2308"/> also states that a negative
         cache entry TTL is taken from the minimum of the SOA.MINIMUM field and
@@ -416,8 +417,8 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
       (minutes or hours), their RRSIG expiration time can be much further in
       the future (weeks). An attacker who is able to successfully spoof
       responses might poison a cache with old NSEC/NSEC3 records. If the
-      resolver is NOT making aggressive use of NSEC/NSEC3, the attacker has to
-      repeat the attack for every query. If the resolver IS making aggressive
+      resolver is not making aggressive use of NSEC/NSEC3, the attacker has to
+      repeat the attack for every query. If the resolver is making aggressive
       use of NSEC/NSEC3, one successful attack would be able to suppress many
       queries for new names, up to the negative TTL.</t>
     </section>
@@ -443,13 +444,29 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
       JINMEI for extensive review and comments, and also Mark Andrews, Casey
       Deccio, Alexander Dupuy, Olafur Gudmundsson, Bob Harold, Shumon Huque,
       John Levine, Pieter Lexis, Matthijs Mekking (who even sent pull
-      requests!) and Ondrej Sury. Mark Andrews also provided the helpful notes
-      for implementors
-      (https://www.ietf.org/mail-archive/web/dnsop/current/msg18332.html)
-      which we made into Appendix B.</t>
+      requests!) and Ondrej Sury.</t>
 
       <section anchor="change-history" title="Change History">
         <t>RFC Editor: Please remove this section prior to publication.</t>
+
+        <t>-08 to -09:<list style="symbols">
+            <t>Made RFC5074 Informative (after discussions with chairs.</t>
+
+            <t>Addressed SecDir comments.</t>
+
+            <t>Addressed OpsDir comments.</t>
+          </list></t>
+
+        <t>-06 to -08:<list style="symbols">
+            <t>Largely editorial, but please see the diffs (editors forgot to
+            update change log when editing, backfilling change log.)</t>
+
+            <t>Changed "replacement" text to be "DNSSEC enabled validating
+            resolvers SHOULD use wildcards ..." to align with text in doc.</t>
+
+            <t>"A resolver that supports aggressive use of NSEC and NSEC3
+            SHOULD" (should -&gt; SHOULD) - to align with rest of text.</t>
+          </list></t>
 
         <t>-05 to -06:<list style="symbols">
             <t>Moved some dangling text around - when the examples were added
@@ -634,10 +651,6 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
             </list></t>
         </section>
       </section>
-
-      <section title="new section">
-        <t/>
-      </section>
     </section>
   </middle>
 
@@ -814,32 +827,6 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
         <seriesInfo name="DOI" value="10.17487/RFC5155"/>
       </reference>
 
-      <reference anchor="RFC5074"
-                 target="http://www.rfc-editor.org/info/rfc5074">
-        <front>
-          <title>DNSSEC Lookaside Validation (DLV)</title>
-
-          <author fullname="S. Weiler" initials="S." surname="Weiler">
-            <organization/>
-          </author>
-
-          <date month="November" year="2007"/>
-
-          <abstract>
-            <t>DNSSEC Lookaside Validation (DLV) is a mechanism for publishing
-            DNS Security (DNSSEC) trust anchors outside of the DNS delegation
-            chain. It allows validating resolvers to validate DNSSEC-signed
-            data from zones whose ancestors either aren't signed or don't
-            publish Delegation Signer (DS) records for their children. This
-            memo provides information for the Internet community.</t>
-          </abstract>
-        </front>
-
-        <seriesInfo name="RFC" value="5074"/>
-
-        <seriesInfo name="DOI" value="10.17487/RFC5074"/>
-      </reference>
-
       <reference anchor="RFC7719"
                  target="http://www.rfc-editor.org/info/rfc7719">
         <front>
@@ -914,6 +901,8 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
       </reference>
 
       <?rfc include='reference.RFC.8020'?>
+
+      <?rfc include='reference.RFC.5074'?>
 
       <reference anchor="root-servers.org"
                  target="http://www.root-servers.org/">
