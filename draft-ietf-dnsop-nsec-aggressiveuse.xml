@@ -6,7 +6,7 @@
 <?rfc tocdepth="4"?>
 <?rfc sortrefs="yes"?>
 <?rfc symrefs="yes"?>
-<rfc category="std" docName="draft-ietf-dnsop-nsec-aggressiveuse-09"
+<rfc category="std" docName="draft-ietf-dnsop-nsec-aggressiveuse-10"
      ipr="trust200902" updates="4035">
   <front>
     <title abbrev="NSEC/NSEC3 usage">Aggressive use of DNSSEC-validated
@@ -91,13 +91,13 @@
       DoS attacks in some circumstances.</t>
 
       <t>This document updates RFC4035 by allowing validating resolvers to
-      generate negative answers based upon NSEC/NSEC3 records (and positive
-      answers in the presence of wildcards).</t>
+      generate negative answers based upon NSEC/NSEC3 records and positive
+      answers in the presence of wildcards.</t>
 
       <t>[ Ed note: Text inside square brackets ([]) is additional background
       information, answers to frequently asked questions, general musings,
-      etc. They will be removed before publication.This document is being
-      collaborated on in Github at:
+      etc. RFC Editor, please remove before publication. This document is
+      being collaborated on in Github at:
       https://github.com/wkumari/draft-ietf-dnsop-nsec-aggressiveuse. The most
       recent version of the document, open issues, etc should all be available
       here. The authors (gratefully) accept pull requests.]</t>
@@ -258,8 +258,9 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
 
       <t>If the negative cache of the validating resolver has sufficient
       information to validate the query, the resolver SHOULD use NSEC, NSEC3
-      and wildcard records aggressively. Otherwise, it MUST fall back to send
-      the query to the authoritative DNS servers.</t>
+      and wildcard records to synthesize answers as described in this
+      document. Otherwise, it MUST fall back to send the query to the
+      authoritative DNS servers.</t>
 
       <section anchor="nsec" title="NSEC">
         <t>The validating resolver needs to check the existence of an NSEC RR

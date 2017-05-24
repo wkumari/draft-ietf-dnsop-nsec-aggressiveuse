@@ -14,7 +14,7 @@ Expires: October 1, 2017                                       W. Kumari
 
 
                 Aggressive use of DNSSEC-validated Cache
-                 draft-ietf-dnsop-nsec-aggressiveuse-09
+                 draft-ietf-dnsop-nsec-aggressiveuse-10
 
 Abstract
 
@@ -28,15 +28,15 @@ Abstract
    resilience to certain DoS attacks in some circumstances.
 
    This document updates RFC4035 by allowing validating resolvers to
-   generate negative answers based upon NSEC/NSEC3 records (and positive
-   answers in the presence of wildcards).
+   generate negative answers based upon NSEC/NSEC3 records and positive
+   answers in the presence of wildcards.
 
    [ Ed note: Text inside square brackets ([]) is additional background
    information, answers to frequently asked questions, general musings,
-   etc.  They will be removed before publication.This document is being
-   collaborated on in Github at: https://github.com/wkumari/draft-ietf-
-   dnsop-nsec-aggressiveuse.  The most recent version of the document,
-   open issues, etc should all be available here.  The authors
+   etc.  RFC Editor, please remove before publication.  This document is
+   being collaborated on in Github at: https://github.com/wkumari/draft-
+   ietf-dnsop-nsec-aggressiveuse.  The most recent version of the
+   document, open issues, etc should all be available here.  The authors
    (gratefully) accept pull requests.]
 
 Status of This Memo
@@ -94,15 +94,15 @@ Table of Contents
    6.  Benefits  . . . . . . . . . . . . . . . . . . . . . . . . . .   7
    7.  Update to RFC 4035  . . . . . . . . . . . . . . . . . . . . .   8
    8.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   8
-   9.  Security Considerations . . . . . . . . . . . . . . . . . . .   8
+   9.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
    10. Implementation Status . . . . . . . . . . . . . . . . . . . .   9
    11. Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .   9
-     11.1.  Change History . . . . . . . . . . . . . . . . . . . . .   9
+     11.1.  Change History . . . . . . . . . . . . . . . . . . . . .  10
        11.1.1.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-01 .  13
        11.1.2.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-02 .  13
        11.1.3.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-03 .  13
    12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  13
-     12.1.  Normative References . . . . . . . . . . . . . . . . . .  13
+     12.1.  Normative References . . . . . . . . . . . . . . . . . .  14
      12.2.  Informative References . . . . . . . . . . . . . . . . .  14
    Appendix A.  Detailed implementation notes  . . . . . . . . . . .  15
    Appendix B.  Procedure for determining ENT vs NXDOMAN with NSEC .  15
@@ -291,8 +291,9 @@ Internet-Draft              NSEC/NSEC3 usage                  March 2017
 
    If the negative cache of the validating resolver has sufficient
    information to validate the query, the resolver SHOULD use NSEC,
-   NSEC3 and wildcard records aggressively.  Otherwise, it MUST fall
-   back to send the query to the authoritative DNS servers.
+   NSEC3 and wildcard records to synthesize answers as described in this
+   document.  Otherwise, it MUST fall back to send the query to the
+   authoritative DNS servers.
 
 5.1.  NSEC
 
@@ -331,7 +332,6 @@ Internet-Draft              NSEC/NSEC3 usage                  March 2017
 
    As long as the validating resolver can determine that a name would
    not exist without the wildcard match, determined according to the
-   rules set out in Section 5.3.4 of [RFC4035] (NSEC), or in Section 8.8
 
 
 
@@ -340,6 +340,7 @@ Fujiwara, et al.         Expires October 1, 2017                [Page 6]
 Internet-Draft              NSEC/NSEC3 usage                  March 2017
 
 
+   rules set out in Section 5.3.4 of [RFC4035] (NSEC), or in Section 8.8
    of [RFC5155], it SHOULD synthesize an answer (or NODATA response) for
    that name using the cached deduced wildcard.  If the corresponding
    wildcard record is not in the cache, it MUST fall back to send the
@@ -386,8 +387,7 @@ Internet-Draft              NSEC/NSEC3 usage                  March 2017
    Decreased authoritative server load:  Because recursive servers can
       answer queries without asking the authoritative server, the
       authoritative servers receive fewer queries.  This decreases the
-      authoritative server bandwidth, queries per second and CPU
-      utilization.
+
 
 
 
@@ -395,6 +395,9 @@ Fujiwara, et al.         Expires October 1, 2017                [Page 7]
 
 Internet-Draft              NSEC/NSEC3 usage                  March 2017
 
+
+      authoritative server bandwidth, queries per second and CPU
+      utilization.
 
    The scale of the benefit depends upon multiple factors, including the
    query distribution.  For example, at the time of this writing, around
@@ -439,11 +442,8 @@ Internet-Draft              NSEC/NSEC3 usage                  March 2017
 
    This document has no IANA actions.
 
-9.  Security Considerations
 
-   Use of NSEC / NSEC3 resource records without DNSSEC validation may
-   create serious security issues, and so this technique requires DNSSEC
-   validation.
+
 
 
 
@@ -451,6 +451,12 @@ Fujiwara, et al.         Expires October 1, 2017                [Page 8]
 
 Internet-Draft              NSEC/NSEC3 usage                  March 2017
 
+
+9.  Security Considerations
+
+   Use of NSEC / NSEC3 resource records without DNSSEC validation may
+   create serious security issues, and so this technique requires DNSSEC
+   validation.
 
    Newly registered resource records may not be used immediately.
    However, choosing suitable TTL value and negative cache TTL value
@@ -494,12 +500,6 @@ Internet-Draft              NSEC/NSEC3 usage                  March 2017
    Huque, John Levine, Pieter Lexis, Matthijs Mekking (who even sent
    pull requests!) and Ondrej Sury.
 
-11.1.  Change History
-
-   RFC Editor: Please remove this section prior to publication.
-
-   -08 to -09:
-
 
 
 
@@ -507,6 +507,12 @@ Fujiwara, et al.         Expires October 1, 2017                [Page 9]
 
 Internet-Draft              NSEC/NSEC3 usage                  March 2017
 
+
+11.1.  Change History
+
+   RFC Editor: Please remove this section prior to publication.
+
+   -08 to -09:
 
    o  Made RFC5074 Informative (after discussions with chairs.
 
@@ -551,18 +557,18 @@ Internet-Draft              NSEC/NSEC3 usage                  March 2017
 
    -03 to -04:
 
-   o  Working group does want the "positive" answers, not just negative
-      ones.  This requires reading what used to be Section 7, and a
-      bunch of cleanup, including:
-
-      *  Additional text in the Problem Statement
-
 
 
 Fujiwara, et al.         Expires October 1, 2017               [Page 10]
 
 Internet-Draft              NSEC/NSEC3 usage                  March 2017
 
+
+   o  Working group does want the "positive" answers, not just negative
+      ones.  This requires reading what used to be Section 7, and a
+      bunch of cleanup, including:
+
+      *  Additional text in the Problem Statement
 
       *  Added a wildcard record to the zone.
 
@@ -606,12 +612,6 @@ Internet-Draft              NSEC/NSEC3 usage                  March 2017
       https://mailarchive.ietf.org/arch/msg/
       dnsop/2ljmmzxtIMCFMLOZmWcSbTYVOy4
 
-   o  A number of good edits from Stephane in: https://www.ietf.org/
-      mail-archive/web/dnsop/current/msg18109.html
-
-   o  A bunch more edits from Jinmei, as in: https://www.ietf.org/mail-
-      archive/web/dnsop/current/msg18206.html
-
 
 
 
@@ -619,6 +619,12 @@ Fujiwara, et al.         Expires October 1, 2017               [Page 11]
 
 Internet-Draft              NSEC/NSEC3 usage                  March 2017
 
+
+   o  A number of good edits from Stephane in: https://www.ietf.org/
+      mail-archive/web/dnsop/current/msg18109.html
+
+   o  A bunch more edits from Jinmei, as in: https://www.ietf.org/mail-
+      archive/web/dnsop/current/msg18206.html
 
    -01 to -02:
 
@@ -663,18 +669,18 @@ Internet-Draft              NSEC/NSEC3 usage                  March 2017
 
    o  Changed main purpose to performance
 
-   o  Use NSEC3/Wildcard keywords
-
-   o  Improved wordings (from good comments)
-
-   o  Simplified pseudo code for NSEC3
-
 
 
 Fujiwara, et al.         Expires October 1, 2017               [Page 12]
 
 Internet-Draft              NSEC/NSEC3 usage                  March 2017
 
+
+   o  Use NSEC3/Wildcard keywords
+
+   o  Improved wordings (from good comments)
+
+   o  Simplified pseudo code for NSEC3
 
    o  Added Warren as co-author.
 
@@ -715,12 +721,6 @@ Internet-Draft              NSEC/NSEC3 usage                  March 2017
 
 12.  References
 
-12.1.  Normative References
-
-   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
-              Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/
-              RFC2119, March 1997,
-              <http://www.rfc-editor.org/info/rfc2119>.
 
 
 
@@ -731,6 +731,13 @@ Fujiwara, et al.         Expires October 1, 2017               [Page 13]
 
 Internet-Draft              NSEC/NSEC3 usage                  March 2017
 
+
+12.1.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/
+              RFC2119, March 1997,
+              <http://www.rfc-editor.org/info/rfc2119>.
 
    [RFC2308]  Andrews, M., "Negative Caching of DNS Queries (DNS
               NCACHE)", RFC 2308, DOI 10.17487/RFC2308, March 1998,
@@ -774,19 +781,16 @@ Internet-Draft              NSEC/NSEC3 usage                  March 2017
               Nothing Underneath", RFC 8020, DOI 10.17487/RFC8020,
               November 2016, <http://www.rfc-editor.org/info/rfc8020>.
 
-   [root-servers.org]
-              IANA, "Root Server Technical Operations Assn",
-              <http://www.root-servers.org/>.
-
-
-
-
 
 
 Fujiwara, et al.         Expires October 1, 2017               [Page 14]
 
 Internet-Draft              NSEC/NSEC3 usage                  March 2017
 
+
+   [root-servers.org]
+              IANA, "Root Server Technical Operations Assn",
+              <http://www.root-servers.org/>.
 
 Appendix A.  Detailed implementation notes
 
@@ -831,10 +835,6 @@ Appendix B.  Procedure for determining ENT vs NXDOMAN with NSEC
    If the given name sorts before or matches the NSEC owner name discard
    it as it does not prove the NXDOMAIN or ENT.
 
-   If the given name is a subdomain of the NSEC owner name and the NS
-   bit is present and the SOA bit is absent then discard the NSEC as it
-   is from a parent zone.
-
 
 
 
@@ -843,6 +843,10 @@ Fujiwara, et al.         Expires October 1, 2017               [Page 15]
 
 Internet-Draft              NSEC/NSEC3 usage                  March 2017
 
+
+   If the given name is a subdomain of the NSEC owner name and the NS
+   bit is present and the SOA bit is absent then discard the NSEC as it
+   is from a parent zone.
 
    If the next domain name sorts after the NSEC owner name and the given
    name sorts after or matches next domain name then discard the NSEC
@@ -886,10 +890,6 @@ Authors' Addresses
    US
 
    Email: warren@kumari.net
-
-
-
-
 
 
 
