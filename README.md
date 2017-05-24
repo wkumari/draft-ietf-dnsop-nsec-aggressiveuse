@@ -8,9 +8,9 @@ Network Working Group                                        K. Fujiwara
 Internet-Draft                                                      JPRS
 Updates: 4035 (if approved)                                      A. Kato
 Intended status: Standards Track                               Keio/WIDE
-Expires: October 1, 2017                                       W. Kumari
+Expires: November 25, 2017                                     W. Kumari
                                                                   Google
-                                                          March 30, 2017
+                                                            May 24, 2017
 
 
                 Aggressive use of DNSSEC-validated Cache
@@ -55,15 +55,15 @@ Status of This Memo
 
 
 
-Fujiwara, et al.         Expires October 1, 2017                [Page 1]
+Fujiwara, et al.        Expires November 25, 2017               [Page 1]
 
-Internet-Draft              NSEC/NSEC3 usage                  March 2017
+Internet-Draft              NSEC/NSEC3 usage                    May 2017
 
 
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on October 1, 2017.
+   This Internet-Draft will expire on November 25, 2017.
 
 Copyright Notice
 
@@ -100,20 +100,20 @@ Table of Contents
      11.1.  Change History . . . . . . . . . . . . . . . . . . . . .  10
        11.1.1.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-01 .  13
        11.1.2.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-02 .  13
-       11.1.3.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-03 .  13
-   12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  13
+       11.1.3.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-03 .  14
+   12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  14
      12.1.  Normative References . . . . . . . . . . . . . . . . . .  14
-     12.2.  Informative References . . . . . . . . . . . . . . . . .  14
+     12.2.  Informative References . . . . . . . . . . . . . . . . .  15
    Appendix A.  Detailed implementation notes  . . . . . . . . . . .  15
-   Appendix B.  Procedure for determining ENT vs NXDOMAN with NSEC .  15
+   Appendix B.  Procedure for determining ENT vs NXDOMAN with NSEC .  16
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  16
 
 
 
 
-Fujiwara, et al.         Expires October 1, 2017                [Page 2]
+Fujiwara, et al.        Expires November 25, 2017               [Page 2]
 
-Internet-Draft              NSEC/NSEC3 usage                  March 2017
+Internet-Draft              NSEC/NSEC3 usage                    May 2017
 
 
 1.  Introduction
@@ -167,9 +167,9 @@ Internet-Draft              NSEC/NSEC3 usage                  March 2017
 
 
 
-Fujiwara, et al.         Expires October 1, 2017                [Page 3]
+Fujiwara, et al.        Expires November 25, 2017               [Page 3]
 
-Internet-Draft              NSEC/NSEC3 usage                  March 2017
+Internet-Draft              NSEC/NSEC3 usage                    May 2017
 
 
    If a validating resolver receives a query for cat.example.com, it
@@ -223,9 +223,9 @@ Internet-Draft              NSEC/NSEC3 usage                  March 2017
 
 
 
-Fujiwara, et al.         Expires October 1, 2017                [Page 4]
+Fujiwara, et al.        Expires November 25, 2017               [Page 4]
 
-Internet-Draft              NSEC/NSEC3 usage                  March 2017
+Internet-Draft              NSEC/NSEC3 usage                    May 2017
 
 
    queried for name.  In the first example above, if the (DNSSEC
@@ -279,9 +279,9 @@ Internet-Draft              NSEC/NSEC3 usage                  March 2017
 
 
 
-Fujiwara, et al.         Expires October 1, 2017                [Page 5]
+Fujiwara, et al.        Expires November 25, 2017               [Page 5]
 
-Internet-Draft              NSEC/NSEC3 usage                  March 2017
+Internet-Draft              NSEC/NSEC3 usage                    May 2017
 
 
 5.  Aggressive use of Cache
@@ -335,9 +335,9 @@ Internet-Draft              NSEC/NSEC3 usage                  March 2017
 
 
 
-Fujiwara, et al.         Expires October 1, 2017                [Page 6]
+Fujiwara, et al.        Expires November 25, 2017               [Page 6]
 
-Internet-Draft              NSEC/NSEC3 usage                  March 2017
+Internet-Draft              NSEC/NSEC3 usage                    May 2017
 
 
    rules set out in Section 5.3.4 of [RFC4035] (NSEC), or in Section 8.8
@@ -391,9 +391,9 @@ Internet-Draft              NSEC/NSEC3 usage                  March 2017
 
 
 
-Fujiwara, et al.         Expires October 1, 2017                [Page 7]
+Fujiwara, et al.        Expires November 25, 2017               [Page 7]
 
-Internet-Draft              NSEC/NSEC3 usage                  March 2017
+Internet-Draft              NSEC/NSEC3 usage                    May 2017
 
 
       authoritative server bandwidth, queries per second and CPU
@@ -447,9 +447,9 @@ Internet-Draft              NSEC/NSEC3 usage                  March 2017
 
 
 
-Fujiwara, et al.         Expires October 1, 2017                [Page 8]
+Fujiwara, et al.        Expires November 25, 2017               [Page 8]
 
-Internet-Draft              NSEC/NSEC3 usage                  March 2017
+Internet-Draft              NSEC/NSEC3 usage                    May 2017
 
 
 9.  Security Considerations
@@ -503,14 +503,24 @@ Internet-Draft              NSEC/NSEC3 usage                  March 2017
 
 
 
-Fujiwara, et al.         Expires October 1, 2017                [Page 9]
+Fujiwara, et al.        Expires November 25, 2017               [Page 9]
 
-Internet-Draft              NSEC/NSEC3 usage                  March 2017
+Internet-Draft              NSEC/NSEC3 usage                    May 2017
 
 
 11.1.  Change History
 
    RFC Editor: Please remove this section prior to publication.
+
+   -09 to -10:
+
+   o  Addressed IESG comments at https://datatracker.ietf.org/doc/draft-
+      ietf-dnsop-nsec-aggressiveuse/ballot/
+
+   o  Main change "the resolver SHOULD use NSEC, NSEC3 and wildcard
+      records aggressively." -> "HOULD use NSEC, NSEC3 and wildcard
+      records to synthesize answers as described in this document"
+      (Mirja) - aggressively wasn't really described...
 
    -08 to -09:
 
@@ -545,6 +555,15 @@ Internet-Draft              NSEC/NSEC3 usage                  March 2017
 
    -04 to -05:
 
+
+
+
+
+Fujiwara, et al.        Expires November 25, 2017              [Page 10]
+
+Internet-Draft              NSEC/NSEC3 usage                    May 2017
+
+
    o  Bob pointed out that I did a stupid - when I added the wildcard to
       'example.com' I made the example wrong / confusing.  I have
       attempted to fix this by adding a second example zone
@@ -556,13 +575,6 @@ Internet-Draft              NSEC/NSEC3 usage                  March 2017
       NXD as an Appendix.
 
    -03 to -04:
-
-
-
-Fujiwara, et al.         Expires October 1, 2017               [Page 10]
-
-Internet-Draft              NSEC/NSEC3 usage                  March 2017
-
 
    o  Working group does want the "positive" answers, not just negative
       ones.  This requires reading what used to be Section 7, and a
@@ -600,6 +612,14 @@ Internet-Draft              NSEC/NSEC3 usage                  March 2017
 
    o  Integrated a bunch of comments from Matthijs Mekking - details in:
       https://github.com/wkumari/draft-ietf-dnsop-nsec-aggressiveuse/
+
+
+
+Fujiwara, et al.        Expires November 25, 2017              [Page 11]
+
+Internet-Draft              NSEC/NSEC3 usage                    May 2017
+
+
       pull/1.  I decided to keep "Aggressive Negative Caching" instead
       of "Aggressive USE OF Negative Caching" for readability.
 
@@ -611,14 +631,6 @@ Internet-Draft              NSEC/NSEC3 usage                  March 2017
    o  MAYs and SHOULD drifted in the text block.  Fixed - thanks to
       https://mailarchive.ietf.org/arch/msg/
       dnsop/2ljmmzxtIMCFMLOZmWcSbTYVOy4
-
-
-
-
-Fujiwara, et al.         Expires October 1, 2017               [Page 11]
-
-Internet-Draft              NSEC/NSEC3 usage                  March 2017
-
 
    o  A number of good edits from Stephane in: https://www.ietf.org/
       mail-archive/web/dnsop/current/msg18109.html
@@ -655,6 +667,15 @@ Internet-Draft              NSEC/NSEC3 usage                  March 2017
 
    o  Cleaned up the TTL section a bit.
 
+
+
+
+
+Fujiwara, et al.        Expires November 25, 2017              [Page 12]
+
+Internet-Draft              NSEC/NSEC3 usage                    May 2017
+
+
    o  Removed Effects section, Additional proposal section, and pseudo
       code.
 
@@ -668,13 +689,6 @@ Internet-Draft              NSEC/NSEC3 usage                  March 2017
    o  Adoption comments
 
    o  Changed main purpose to performance
-
-
-
-Fujiwara, et al.         Expires October 1, 2017               [Page 12]
-
-Internet-Draft              NSEC/NSEC3 usage                  March 2017
-
 
    o  Use NSEC3/Wildcard keywords
 
@@ -707,6 +721,17 @@ Internet-Draft              NSEC/NSEC3 usage                  March 2017
    o  Moved Aggressive Negative Caching Flag idea into Additional
       Proposals
 
+
+
+
+
+
+
+Fujiwara, et al.        Expires November 25, 2017              [Page 13]
+
+Internet-Draft              NSEC/NSEC3 usage                    May 2017
+
+
 11.1.3.  Version draft-fujiwara-dnsop-nsec-aggressiveuse-03
 
    o  Added "Partial implementation"
@@ -720,17 +745,6 @@ Internet-Draft              NSEC/NSEC3 usage                  March 2017
    o  Updated pseudo code
 
 12.  References
-
-
-
-
-
-
-
-Fujiwara, et al.         Expires October 1, 2017               [Page 13]
-
-Internet-Draft              NSEC/NSEC3 usage                  March 2017
-
 
 12.1.  Normative References
 
@@ -765,6 +779,15 @@ Internet-Draft              NSEC/NSEC3 usage                  March 2017
               Terminology", RFC 7719, DOI 10.17487/RFC7719, December
               2015, <http://www.rfc-editor.org/info/rfc7719>.
 
+
+
+
+
+Fujiwara, et al.        Expires November 25, 2017              [Page 14]
+
+Internet-Draft              NSEC/NSEC3 usage                    May 2017
+
+
 12.2.  Informative References
 
    [I-D.vixie-dnsext-resimprove]
@@ -780,13 +803,6 @@ Internet-Draft              NSEC/NSEC3 usage                  March 2017
    [RFC8020]  Bortzmeyer, S. and S. Huque, "NXDOMAIN: There Really Is
               Nothing Underneath", RFC 8020, DOI 10.17487/RFC8020,
               November 2016, <http://www.rfc-editor.org/info/rfc8020>.
-
-
-
-Fujiwara, et al.         Expires October 1, 2017               [Page 14]
-
-Internet-Draft              NSEC/NSEC3 usage                  March 2017
-
 
    [root-servers.org]
               IANA, "Root Server Technical Operations Assn",
@@ -819,6 +835,15 @@ Appendix A.  Detailed implementation notes
    o  The aggressive negative caching may be inserted at the cache
       lookup part of the recursive resolvers.
 
+
+
+
+
+Fujiwara, et al.        Expires November 25, 2017              [Page 15]
+
+Internet-Draft              NSEC/NSEC3 usage                    May 2017
+
+
    o  If errors happen in aggressive negative caching algorithm,
       resolvers MUST fall back to resolve the query as usual.  "Resolve
       the query as usual" means that the resolver must process the query
@@ -834,15 +859,6 @@ Appendix B.  Procedure for determining ENT vs NXDOMAN with NSEC
 
    If the given name sorts before or matches the NSEC owner name discard
    it as it does not prove the NXDOMAIN or ENT.
-
-
-
-
-
-Fujiwara, et al.         Expires October 1, 2017               [Page 15]
-
-Internet-Draft              NSEC/NSEC3 usage                  March 2017
-
 
    If the given name is a subdomain of the NSEC owner name and the NS
    bit is present and the SOA bit is absent then discard the NSEC as it
@@ -873,6 +889,17 @@ Authors' Addresses
    Email: fujiwara@jprs.co.jp
 
 
+
+
+
+
+
+
+Fujiwara, et al.        Expires November 25, 2017              [Page 16]
+
+Internet-Draft              NSEC/NSEC3 usage                    May 2017
+
+
    Akira Kato
    Keio University/WIDE Project
    Graduate School of Media Design, 4-1-1 Hiyoshi
@@ -895,5 +922,34 @@ Authors' Addresses
 
 
 
-Fujiwara, et al.         Expires October 1, 2017               [Page 16]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fujiwara, et al.        Expires November 25, 2017              [Page 17]
 ```

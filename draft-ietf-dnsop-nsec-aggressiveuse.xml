@@ -74,7 +74,7 @@
       </address>
     </author>
 
-    <date day="30" month="March" year="2017"/>
+    <date day="24" month="May" year="2017"/>
 
     <area>operations</area>
 
@@ -449,6 +449,16 @@ zucchini.example.org IN A 192.0.2.3]]></artwork>
 
       <section anchor="change-history" title="Change History">
         <t>RFC Editor: Please remove this section prior to publication.</t>
+
+        <t>-09 to -10:<list style="symbols">
+            <t>Addressed IESG comments at
+            https://datatracker.ietf.org/doc/draft-ietf-dnsop-nsec-aggressiveuse/ballot/</t>
+
+            <t>Main change "the resolver SHOULD use NSEC, NSEC3 and wildcard
+            records aggressively." -&gt; "HOULD use NSEC, NSEC3 and wildcard
+            records to synthesize answers as described in this document"
+            (Mirja) - aggressively wasn't really described...</t>
+          </list></t>
 
         <t>-08 to -09:<list style="symbols">
             <t>Made RFC5074 Informative (after discussions with chairs.</t>
